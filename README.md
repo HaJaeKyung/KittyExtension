@@ -4,4 +4,4 @@ Gives color coded rarity info by hovering and more
 
 ### Installing
 Requires [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en)  
-Create a new Tampermonkey script inside the Dashboard and paste the [script code](https://raw.githubusercontent.com/HaJaeKyung/CryptoCatAdd/master/script) inside.
+Create a new Tampermonkey script inside the Dashboard and paste the [script code](https://raw.githubusercontent.com/HaJaeKyung/CryptoCatAdd/master/script) inside. Then you just need to save it and reload the kitty site.
