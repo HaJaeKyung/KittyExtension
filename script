@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.11
+// @version      0.12
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -10,10 +10,20 @@
 // ==/UserScript==
 
 $(function() {
-    $("head").append("<style> .extAttUl{ z-index: 3; position:absolute; top: 0; right: 0; padding: 0px; margin: 0px;} .extAtt{ padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; } </style>");
+    $("head").append("<style> .extAttUl{ z-index: 3; position:absolute; top: 0; right: 0; padding: 0px; margin: 0px;} .extAtt{ padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; }</style>");
+    $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(6px); } </style>");
     console.log('CryptoKitties Extension Loaded');
     var found = false;
     var foundId = [];
+    var url = location.href;
+    document.body.addEventListener('click', function() {
+        requestAnimationFrame(function() {
+            if (url!==location.href) {
+                foundId = [];
+                url = location.href;
+            }
+        });
+    }, true);
     var tbl = {
         "maincoon": { "count": 181 },
         "wingtips": { "count": 186 },
@@ -75,26 +85,28 @@ $(function() {
             console.log('Requesting: '+ id);
             curId = id;
             foundId.push(id);
-            $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
-                if (element.children[0] && element.children[0].children[0]) {
-                    element.children[0].children[0].innerHTML += "<ul class='extAttUl'></ul>";
+
+            if (element.children[0] && element.children[0]) {
+                element.children[0].children[0].innerHTML += "<ul  style='list-style: none;' class='extBounce extAttUl'>🐈</ul>";
+                $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
                     var ul = element.getElementsByClassName("extAttUl")[0];
+                    ul.classList.remove("extBounce");
+                    ul.innerHTML = "";
                     for (var x in data.cattributes) {
                         if (data.cattributes[x]) {
                             //console.log(getColor(data.cattributes[x]));
                             var firstPart = "'background-color:'"+getColor(data.cattributes[x]);
-                            ul.innerHTML += "<ul class='extAtt' style=\'background-color:"+getColor(data.cattributes[x])[0]+"\'>"+data.cattributes[x]+"</li>";
+                            ul.innerHTML += "<li class='extAtt' style=\'background-color:"+getColor(data.cattributes[x])[0]+"\'>"+data.cattributes[x]+"</li>";
                         }
                     }
-                }
-            });
+                });
+            }
         }
     });
 
     setInterval(function() {
         var curPage = document.getElementsByClassName("KittyHeader-details");
         if (curPage.length > 0 && curPage[0].innerText != curCat) {
-            console.log('found new cat');
             curCat = curPage[0].innerText;
             if (document.getElementsByClassName("ListAttributes-item").length > 0) {
                 var cattributes = document.getElementsByClassName("ListAttributes-item");
