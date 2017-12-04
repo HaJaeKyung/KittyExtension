@@ -1,5 +1,5 @@
 ### CryptoCat Extension
-Gives color coded rarity info by hovering and more
+Gives color coded rarity info by hovering and more  
 <img src="https://giant.gfycat.com/ShimmeringActiveCopperhead.gif" alt="Example" height="460px">/>
 
 ### Installing
