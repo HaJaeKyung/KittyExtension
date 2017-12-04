@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.1
+// @version      0.11
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -11,7 +11,7 @@
 
 $(function() {
     $("head").append("<style> .extAttUl{ z-index: 3; position:absolute; top: 0; right: 0; padding: 0px; margin: 0px;} .extAtt{ padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; } </style>");
-    console.log('CryptoKitties Loaded');
+    console.log('CryptoKitties Extension Loaded');
     var found = false;
     var foundId = [];
     var tbl = {
@@ -68,25 +68,25 @@ $(function() {
         return [color, count];
     }
 
-    $( "body" ).on( "mouseover", "a", function(  ) {
+    $( "#app" ).on( "mouseover", "a", function() {
         var element = $( this )[0];
         var id = /[^/]*$/.exec(element)[0];
-        if (!isNaN(id) && id != curId && !foundId.includes(id)) {
+        if (!isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity")) {
             console.log('Requesting: '+ id);
             curId = id;
             foundId.push(id);
             $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
-                console.log(data.cattributes);
-                element.children[0].children[0].innerHTML += "<ul class='extAttUl'></ul>";
-                var ul = element.getElementsByClassName("extAttUl")[0];
-                for (var x in data.cattributes) {
-                    if (data.cattributes[x]) {
-                        //console.log(getColor(data.cattributes[x]));
-                        var firstPart = "'background-color:'"+getColor(data.cattributes[x]);
-                        ul.innerHTML += "<ul class='extAtt' style=\'background-color:"+getColor(data.cattributes[x])[0]+"\'>"+data.cattributes[x]+"</li>";
+                if (element.children[0] && element.children[0].children[0]) {
+                    element.children[0].children[0].innerHTML += "<ul class='extAttUl'></ul>";
+                    var ul = element.getElementsByClassName("extAttUl")[0];
+                    for (var x in data.cattributes) {
+                        if (data.cattributes[x]) {
+                            //console.log(getColor(data.cattributes[x]));
+                            var firstPart = "'background-color:'"+getColor(data.cattributes[x]);
+                            ul.innerHTML += "<ul class='extAtt' style=\'background-color:"+getColor(data.cattributes[x])[0]+"\'>"+data.cattributes[x]+"</li>";
+                        }
                     }
                 }
-
             });
         }
     });
@@ -94,6 +94,7 @@ $(function() {
     setInterval(function() {
         var curPage = document.getElementsByClassName("KittyHeader-details");
         if (curPage.length > 0 && curPage[0].innerText != curCat) {
+            console.log('found new cat');
             curCat = curPage[0].innerText;
             if (document.getElementsByClassName("ListAttributes-item").length > 0) {
                 var cattributes = document.getElementsByClassName("ListAttributes-item");
@@ -101,22 +102,14 @@ $(function() {
                 for (var att in cattributes) {
                     if (cattributes[att].style) {
                         var catt = cattributes[att].innerText;
-                        if (tbl[catt]) {
-                            if (tbl[catt].count < 3000) {
-                                cattributes[att].style.backgroundColor = "#EC7063";
-                            } else if (tbl[catt].count < 5500) {
-                                cattributes[att].style.backgroundColor = "#F7DC6F";
-                            } else {
-                                cattributes[att].style.backgroundColor = "#48C9B0";
-                            }
-                            cattributes[att].innerHTML += " ("+ tbl[catt].count +")";
-                        } else {
-                            cattributes[att].style.backgroundColor = "white";
-                            cattributes[att].innerHTML += " (10k+)";
-                        }
+                        var arr = getColor(catt);
+                        var color = arr[0];
+                        var num = arr[1];
+                        cattributes[att].style.backgroundColor = color;
+                        cattributes[att].innerHTML += num;
                     }
                 }
             }
         }
-    }, 1000);
+    }, 2000);
 });
