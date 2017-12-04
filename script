@@ -1,0 +1,122 @@
+// ==UserScript==
+// @name         Crypto Kitty Info Extension
+// @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
+// @version      0.1
+// @description  Adds stat info to the site
+// @author       HaJaeKyung
+// @match        *.cryptokitties.co/*
+// @grant        none
+// @require http://code.jquery.com/jquery-3.2.1.min.js
+// ==/UserScript==
+
+$(function() {
+    $("head").append("<style> .extAttUl{ z-index: 3; position:absolute; top: 0; right: 0; padding: 0px; margin: 0px;} .extAtt{ padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; } </style>");
+    console.log('CryptoKitties Loaded');
+    var found = false;
+    var foundId = [];
+    var tbl = {
+        "maincoon": { "count": 181 },
+        "wingtips": { "count": 186 },
+        "jaguar": { "count": 189 },
+        "whixtensions": { "count": 215 },
+        "cerulian": { "count": 426 },
+        "chartreux": { "count": 507 },
+        "fabulous": { "count": 967 },
+        "peach": { "count": 1037 },
+        "scarlet": { "count": 2094 },
+        "bubblegum": { "count": 2108 },
+        "bloodred": { "count": 2353 },
+        "otaku": { "count": 2385 },
+        "dali": { "count": 2482 },
+        "skyblue": { "count": 2997 },
+        "emeraldgreen": { "count": 3045 },
+        "spock": { "count": 3221 },
+        "limegreen": { "count": 3680 },
+        "tigerpunk": { "count": 3816 },
+        "beard": { "count": 4350 },
+        "barkbrown": { "count": 4924 },
+        "laperm": { "count": 4936 },
+        "calicool": { "count": 4948 },
+        "cloudwhite": { "count": 5028 },
+        "cymric": { "count": 5261 },
+        "chestnut": { "count": 5586 },
+        "saycheese": { "count": 6200 },
+        "tongue": { "count": 6574 },
+        "shadowgrey": { "count": 8749 },
+        "coffee": { "count": 8816 },
+        "salmon": { "count": 9141 },
+        "royalpurple": { "count": 9541 }
+    };
+    var curCat = 'n/a';
+    var curId = 'n/a';
+
+    function getColor(catt) {
+        var color, count;
+        if (tbl[catt]) {
+            if (tbl[catt].count < 3000) {
+                color = "#EC7063";
+            } else if (tbl[catt].count < 5500) {
+                color = "#F7DC6F";
+            } else {
+                color = "#48C9B0";
+            }
+            count = " ("+ tbl[catt].count +")";
+        } else {
+            color = "white";
+            count = " (10k+)";
+        }
+        return [color, count];
+    }
+
+    $( "body" ).on( "mouseover", "a", function(  ) {
+        var element = $( this )[0];
+        var id = /[^/]*$/.exec(element)[0];
+        if (!isNaN(id) && id != curId && !foundId.includes(id)) {
+            console.log('Requesting: '+ id);
+            curId = id;
+            foundId.push(id);
+            $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
+                console.log(data.cattributes);
+                element.children[0].children[0].innerHTML += "<ul class='extAttUl'></ul>";
+                var ul = element.getElementsByClassName("extAttUl")[0];
+                for (var x in data.cattributes) {
+                    if (data.cattributes[x]) {
+                        //console.log(getColor(data.cattributes[x]));
+                        var firstPart = "'background-color:'"+getColor(data.cattributes[x]);
+                        ul.innerHTML += "<ul class='extAtt' style=\'background-color:"+getColor(data.cattributes[x])[0]+"\'>"+data.cattributes[x]+"</li>";
+                    }
+                }
+
+            });
+        }
+    });
+
+    setInterval(function() {
+        var curPage = document.getElementsByClassName("KittyHeader-details");
+        if (curPage.length > 0 && curPage[0].innerText != curCat) {
+            curCat = curPage[0].innerText;
+            if (document.getElementsByClassName("ListAttributes-item").length > 0) {
+                var cattributes = document.getElementsByClassName("ListAttributes-item");
+
+                for (var att in cattributes) {
+                    if (cattributes[att].style) {
+                        var catt = cattributes[att].innerText;
+                        if (tbl[catt]) {
+                            if (tbl[catt].count < 3000) {
+                                cattributes[att].style.backgroundColor = "#EC7063";
+                            } else if (tbl[catt].count < 5500) {
+                                cattributes[att].style.backgroundColor = "#F7DC6F";
+                            } else {
+                                cattributes[att].style.backgroundColor = "#48C9B0";
+                            }
+                            cattributes[att].innerHTML += " ("+ tbl[catt].count +")";
+                        } else {
+                            cattributes[att].style.backgroundColor = "white";
+                            cattributes[att].innerHTML += " (10k+)";
+                        }
+                    }
+                }
+            }
+        }
+    }, 1000);
+});
