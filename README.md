@@ -1,4 +1,4 @@
-### CryptoCat Extension
+### 😺 Kitty Extension 😺
 Gives color coded rarity info by hovering and more  
 <img src="https://thumbs.gfycat.com/CloudyWarlikeChrysalis-size_restricted.gif" alt="Example" height="460px">
 
