@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.14
+// @version      0.15
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -29,7 +29,7 @@ $(function() {
         });
     }, true);
     var tbl = {
-        "googly": { "count": 0.001 },
+        "googly": { "count": 0.002 },
         "maincoon": { "count": 0.2 },
         "wingtips": { "count": 0.2 },
         "jaguar": { "count": 0.2 },
@@ -37,7 +37,8 @@ $(function() {
         "cerulian": { "count": 0.7 },
         "chartreux": { "count": 0.8 },
         "fabulous": { "count": 1.5 },
-        "peach": { "count": 1.5 },
+        "gold": { "count": 1.5 },
+        "peach": { "count": 1.6 },
         "scarlet": { "count": 3.4 },
         "bubblegum": { "count": 3.4 },
         "bloodred": { "count": 3.4 },
