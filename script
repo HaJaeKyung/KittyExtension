@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.19
+// @version      0.20
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
 // @match        *.kittyexplorer.com/*
 // @grant        none
-// @require http://code.jquery.com/jquery-3.2.1.min.js
+// @require      http://code.jquery.com/jquery-3.2.1.min.js
 // ==/UserScript==
 
 $(function() {
@@ -137,6 +137,10 @@ $(function() {
             if (hasLocalStorage) {
                 saveStorage(id, data.cattributes);
             }
+        }).fail(function() {
+            var ul = element.getElementsByClassName("extAttUl")[0];
+            ul.classList.remove("extBounce");
+            ul.innerHTML = "😿";
         });
     }
 
