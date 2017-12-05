@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.17
+// @version      0.18
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -11,8 +11,9 @@
 
 $(function() {
     console.log('CryptoKitties Extension Loaded');
-    $("head").append("<style> .extAttUl{ z-index: 3; position:absolute; top: 0; right: 0; padding: 0px; margin: 0px;} .extAtt{ padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; }</style>");
-    $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(6px); } </style>");
+    $("head").append("<style> .extAttUl{ overflow: visible; z-index: 3; position:absolute; bottom: 0; right: 0; padding: 0px; margin: 0px;} .extAtt{ padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; }</style>");
+    $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
+    $("head").append("<style> .KittyCard { overflow: visible; } </style>");
 
     var found = false;
     var foundId = [];
