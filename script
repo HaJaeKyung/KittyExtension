@@ -20,6 +20,7 @@ $(function() {
     var curCat = 'n/a';
     var curId = 'n/a';
     var url = location.href;
+    var hasLocalStorage = typeof(Storage) !== "undefined";
     document.body.addEventListener('click', function() {
         requestAnimationFrame(function() {
             if (url!==location.href) {
@@ -89,29 +90,44 @@ $(function() {
         }
         return [color, count];
     }
-
+    function isValidKittyId(id){
+      return !isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId;
+    }
+    function renderCattributes(cattributes, element) {
+        var ul = element.getElementsByClassName("extAttUl")[0];
+        ul.classList.remove("extBounce");
+        ul.innerHTML = "";
+        for (var x in cattributes) {
+            if (cattributes[x]) {
+                var firstPart = "'background-color:'"+getColor(cattributes[x]);
+                ul.innerHTML += "<li class='extAtt' style=\'background-color:"+getColor(cattributes[x])[0]+"\'>"+cattributes[x]+"</li>";
+                
+            }
+        }
+    }
     //Creates overlay on hover
     $( "#app" ).on( "mouseover", "a", function() {
         var element = $( this )[0];
         var id = /[^/]*$/.exec(element)[0];
-        if (!isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity")) {
-            console.log('Requesting: '+ id);
+        if ( isValidKittyId(id) && !document.URL.includes("activity")) {
             curId = id;
-            foundId.push(id);
-
             if (element.children[0] && element.children[0].innerHTML) {
                 element.children[0].children[0].innerHTML += "<ul  style='list-style: none;' class='extBounce extAttUl'>🐈</ul>";
-                $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
-                    var ul = element.getElementsByClassName("extAttUl")[0];
-                    ul.classList.remove("extBounce");
-                    ul.innerHTML = "";
-                    for (var x in data.cattributes) {
-                        if (data.cattributes[x]) {
-                            var firstPart = "'background-color:'"+getColor(data.cattributes[x]);
-                            ul.innerHTML += "<li class='extAtt' style=\'background-color:"+getColor(data.cattributes[x])[0]+"\'>"+data.cattributes[x]+"</li>";
+                if( hasLocalStorage && localStorage.getItem('kitty-'+id) !== null){
+                    console.log('Was cached: '+ id);
+                    var kittyCattributes = JSON.parse(localStorage.getItem('kitty-'+id));
+                    renderCattributes(kittyCattributes, element);
+                }
+                else{
+                    console.log('Requesting: '+ id);
+                    $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
+                        renderCattributes(data.cattributes, element);
+                        if(hasLocalStorage){
+                            localStorage.setItem('kitty-'+id, JSON.stringify(data.cattributes));
+                            localStorage.setItem('kitty-'+id+'-cacheTime', JSON.stringify(new Date()));
                         }
-                    }
-                });
+                    });
+                }
             }
         }
     });
