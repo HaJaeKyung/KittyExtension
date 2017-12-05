@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.16
+// @version      0.17
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -49,6 +49,7 @@ $(function() {
         "spock": { "count": 5.3 },
         "limegreen": { "count": 5.5 },
         "tigerpunk": { "count": 5.5 },
+        "mauveover": { "count": 7.7 },
         "beard": { "count": 6 },
         "barkbrown": { "count": 7.9 },
         "laperm": { "count": 7.9 },
@@ -97,7 +98,7 @@ $(function() {
             curId = id;
             foundId.push(id);
 
-            if (element.children[0] && element.children[0]) {
+            if (element.children[0] && element.children[0].innerHTML) {
                 element.children[0].children[0].innerHTML += "<ul  style='list-style: none;' class='extBounce extAttUl'>🐈</ul>";
                 $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
                     var ul = element.getElementsByClassName("extAttUl")[0];
@@ -117,8 +118,8 @@ $(function() {
     //Updates attributes on specific kitty page
     setInterval(function() {
         var curPage = document.getElementsByClassName("KittyHeader-details");
-        if (curPage.length > 0 && curPage[0].innerText != curCat) {
-            curCat = curPage[0].innerText;
+        if (curPage.length > 0 && curPage[0].innerHTML.substr(0, curPage[0].innerHTML.indexOf('</span>')) != curCat) {
+            curCat = curPage[0].innerHTML.substr(0, curPage[0].innerHTML.indexOf('</span>'));
             if (document.getElementsByClassName("ListAttributes-item").length > 0) {
                 var cattributes = document.getElementsByClassName("ListAttributes-item");
 
