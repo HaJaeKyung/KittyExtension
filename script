@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.12
+// @version      0.14
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -10,74 +10,84 @@
 // ==/UserScript==
 
 $(function() {
+    console.log('CryptoKitties Extension Loaded');
     $("head").append("<style> .extAttUl{ z-index: 3; position:absolute; top: 0; right: 0; padding: 0px; margin: 0px;} .extAtt{ padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; }</style>");
     $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(6px); } </style>");
-    console.log('CryptoKitties Extension Loaded');
+
     var found = false;
     var foundId = [];
+    var curCat = 'n/a';
+    var curId = 'n/a';
     var url = location.href;
     document.body.addEventListener('click', function() {
         requestAnimationFrame(function() {
             if (url!==location.href) {
+                //Clears id cache on page change
                 foundId = [];
                 url = location.href;
             }
         });
     }, true);
     var tbl = {
-        "maincoon": { "count": 181 },
-        "wingtips": { "count": 186 },
-        "jaguar": { "count": 189 },
-        "whixtensions": { "count": 215 },
-        "cerulian": { "count": 426 },
-        "chartreux": { "count": 507 },
-        "fabulous": { "count": 967 },
-        "peach": { "count": 1037 },
-        "scarlet": { "count": 2094 },
-        "bubblegum": { "count": 2108 },
-        "bloodred": { "count": 2353 },
-        "otaku": { "count": 2385 },
-        "dali": { "count": 2482 },
-        "skyblue": { "count": 2997 },
-        "emeraldgreen": { "count": 3045 },
-        "spock": { "count": 3221 },
-        "limegreen": { "count": 3680 },
-        "tigerpunk": { "count": 3816 },
-        "beard": { "count": 4350 },
-        "barkbrown": { "count": 4924 },
-        "laperm": { "count": 4936 },
-        "calicool": { "count": 4948 },
-        "cloudwhite": { "count": 5028 },
-        "cymric": { "count": 5261 },
-        "chestnut": { "count": 5586 },
-        "saycheese": { "count": 6200 },
-        "tongue": { "count": 6574 },
-        "shadowgrey": { "count": 8749 },
-        "coffee": { "count": 8816 },
-        "salmon": { "count": 9141 },
-        "royalpurple": { "count": 9541 }
+        "googly": { "count": 0.001 },
+        "maincoon": { "count": 0.2 },
+        "wingtips": { "count": 0.2 },
+        "jaguar": { "count": 0.2 },
+        "whixtensions": { "count": 0.4 },
+        "cerulian": { "count": 0.7 },
+        "chartreux": { "count": 0.8 },
+        "fabulous": { "count": 1.5 },
+        "peach": { "count": 1.5 },
+        "scarlet": { "count": 3.4 },
+        "bubblegum": { "count": 3.4 },
+        "bloodred": { "count": 3.4 },
+        "otaku": { "count": 3.6 },
+        "dali": { "count": 3.6 },
+        "skyblue": { "count": 4.7 },
+        "emeraldgreen": { "count": 5.0 },
+        "spock": { "count": 5.3 },
+        "limegreen": { "count": 5.5 },
+        "tigerpunk": { "count": 5.5 },
+        "beard": { "count": 6 },
+        "barkbrown": { "count": 7.9 },
+        "laperm": { "count": 7.9 },
+        "calicool": { "count": 7.9 },
+        "cloudwhite": { "count": 7.9 },
+        "cymric": { "count": 8.6 },
+        "chestnut": { "count": 8.8 },
+        "saycheese": { "count": 10.5 },
+        "tongue": { "count": 10.5 },
+        "shadowgrey": { "count": 14 },
+        "coffee": { "count": 14 },
+        "salmon": { "count": 14.7 },
+        "royalpurple": { "count": 15.3 },
+        "chocolate": { "count": 16.9 },
+        //"swampgreen": { "count": 17 },
+        //"mintgreen": { "count": 17.3 },
+        //"orangesoda": { "count": 17.3 },
+        //"simple": { "count": 17.3 },
+        //"topaz": { "count": 17.3 },
     };
-    var curCat = 'n/a';
-    var curId = 'n/a';
 
     function getColor(catt) {
         var color, count;
         if (tbl[catt]) {
-            if (tbl[catt].count < 3000) {
+            if (tbl[catt].count < 1.6) {
                 color = "#EC7063";
-            } else if (tbl[catt].count < 5500) {
+            } else if (tbl[catt].count < 8) {
                 color = "#F7DC6F";
             } else {
                 color = "#48C9B0";
             }
-            count = " ("+ tbl[catt].count +")";
+            count = " ("+ tbl[catt].count +"%)";
         } else {
             color = "white";
-            count = " (10k+)";
+            count = " (17%+)";
         }
         return [color, count];
     }
 
+    //Creates overlay on hover
     $( "#app" ).on( "mouseover", "a", function() {
         var element = $( this )[0];
         var id = /[^/]*$/.exec(element)[0];
@@ -94,7 +104,6 @@ $(function() {
                     ul.innerHTML = "";
                     for (var x in data.cattributes) {
                         if (data.cattributes[x]) {
-                            //console.log(getColor(data.cattributes[x]));
                             var firstPart = "'background-color:'"+getColor(data.cattributes[x]);
                             ul.innerHTML += "<li class='extAtt' style=\'background-color:"+getColor(data.cattributes[x])[0]+"\'>"+data.cattributes[x]+"</li>";
                         }
@@ -104,6 +113,7 @@ $(function() {
         }
     });
 
+    //Updates attributes on specific kitty page
     setInterval(function() {
         var curPage = document.getElementsByClassName("KittyHeader-details");
         if (curPage.length > 0 && curPage[0].innerText != curCat) {
