@@ -30,7 +30,7 @@ $(function() {
     }, true);
     var tbl = {
         "googly": { "count": 0.002 },
-        "maincoon": { "count": 0.2 },
+        "mainecoon": { "count": 0.2 },
         "wingtips": { "count": 0.2 },
         "jaguar": { "count": 0.2 },
         "whixtensions": { "count": 0.4 },
