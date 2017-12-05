@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.15
+// @version      0.16
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -73,7 +73,7 @@ $(function() {
     function getColor(catt) {
         var color, count;
         if (tbl[catt]) {
-            if (tbl[catt].count < 1.6) {
+            if (tbl[catt].count < 1.65) {
                 color = "#EC7063";
             } else if (tbl[catt].count < 8) {
                 color = "#F7DC6F";
