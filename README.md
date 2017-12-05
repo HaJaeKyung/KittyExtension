@@ -10,4 +10,8 @@ Gives color coded rarity info by hovering and more
 Red: very rare  
 Yellow: rare  
 Green: uncommon  
-White: common  
+White: common   
+
+**Donations**  
+Any ether or kitties would be appreciated and help motivate me to add new features (:  
+0x221F890d45213B100c90F50a4509943156EcBFf5
