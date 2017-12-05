@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
-// @version      0.18
+// @version      0.19
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
+// @match        *.kittyexplorer.com/*
 // @grant        none
 // @require http://code.jquery.com/jquery-3.2.1.min.js
 // ==/UserScript==
@@ -30,21 +31,21 @@ $(function() {
         });
     }, true);
     var tbl = {
-        "googly": { "count": 0.002 },
-        "mainecoon": { "count": 0.2 },
-        "wingtips": { "count": 0.2 },
+        "googly": { "count": 0.06 },
+        "mainecoon": { "count": 0.35 },
+        "wingtips": { "count": 0.275 },
         "jaguar": { "count": 0.2 },
-        "whixtensions": { "count": 0.4 },
-        "cerulian": { "count": 0.7 },
-        "chartreux": { "count": 0.8 },
+        "whixtensions": { "count": 0.49 },
+        "cerulian": { "count": 0.8 },
+        "chartreux": { "count": 0.95 },
         "fabulous": { "count": 1.5 },
-        "gold": { "count": 1.5 },
-        "peach": { "count": 1.6 },
-        "scarlet": { "count": 3.4 },
+        "gold": { "count": 1.9 },
+        "peach": { "count": 2.1 },
+        "scarlet": { "count": 4 },
         "bubblegum": { "count": 3.4 },
-        "bloodred": { "count": 3.4 },
-        "otaku": { "count": 3.6 },
-        "dali": { "count": 3.6 },
+        "bloodred": { "count": 4.4 },
+        "otaku": { "count": 4 },
+        "dali": { "count": 4 },
         "skyblue": { "count": 4.7 },
         "emeraldgreen": { "count": 5.0 },
         "spock": { "count": 5.3 },
@@ -65,56 +66,120 @@ $(function() {
         "salmon": { "count": 14.7 },
         "royalpurple": { "count": 15.3 },
         "chocolate": { "count": 16.9 },
-        //"swampgreen": { "count": 17 },
-        //"mintgreen": { "count": 17.3 },
-        //"orangesoda": { "count": 17.3 },
-        //"simple": { "count": 17.3 },
-        //"topaz": { "count": 17.3 },
+        "swampgreen": { "count": 17 },
+        "mintgreen": { "count": 17.3 },
+        "topaz": { "count": 17.3 },
+        "lemonade": { "count": 17.4 },
+        "orangesoda": { "count": 17.4 },
+        "simple": { "count": 17.4 },
+        "sphynx": { "count": 18 },
+        "munchkin": { "count": 18 },
+        "aquamarine": { "count": 18 },
+        "raisedbrow": { "count": 18.6 },
+        "greymatter": { "count": 18.8 },
+        "happygokitty": { "count": 21 },
+        "strawberry": { "count": 21.2 },
+        "soserious": { "count": 21.6 },
+        "ragamuffin": { "count": 21.8 },
+        "sizzurp": { "count": 22.5 },
+        "himalayan": { "count": 25 },
+        "pouty": { "count": 25 },
+        "crazy": { "count": 25 },
+        "thicccbrowz": { "count": 25 },
+        "luckystripe": { "count": 25 },
+        "granitegrey": { "count": 25 },
+        "kittencream": { "count": 25 },
+        "totesbasic": { "count": 25 },
     };
+    var hasLocalStorage = typeof(Storage) !== "undefined";
+    var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
+    var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
+    
+    function saveStorage(id, cattributes) {
+        if (window.location.pathname == "/my-kitties") {
+            storageMyTbl['id'+id] = cattributes;
+            localStorage.setItem('kittyExtensionMyTbl', JSON.stringify(storageMyTbl));
+        } else {
+            storageTbl['id'+id] = cattributes;
+            if (Object.keys(storageTbl).length > 1000) {
+                for (var first in storageTbl) break;
+                delete storageTbl[first];
+            }
+            localStorage.setItem('kittyExtensionTbl', JSON.stringify(storageTbl));
+        }
+    }
 
     function getColor(catt) {
         var color, count;
         if (tbl[catt]) {
-            if (tbl[catt].count < 1.65) {
+            if (tbl[catt].count <= 2.5) {
                 color = "#EC7063";
-            } else if (tbl[catt].count < 8) {
+            } else if (tbl[catt].count < 10) {
                 color = "#F7DC6F";
-            } else {
+            } else if (tbl[catt].count <= 17) {
                 color = "#48C9B0";
+            } else if (tbl[catt].count <= 20) {
+                color = "white";
+            } else {
+                color = "white";
             }
-            count = " ("+ tbl[catt].count +"%)";
+            count = tbl[catt].count <= 20 ? " ("+ tbl[catt].count +"%)" : " (20%+)";
         } else {
-            color = "white";
-            count = " (17%+)";
+            color = "#f1cbff";
+            count = " (Ultra%)";
         }
         return [color, count];
     }
 
-    //Creates overlay on hover
-    $( "#app" ).on( "mouseover", "a", function() {
-        var element = $( this )[0];
-        var id = /[^/]*$/.exec(element)[0];
-        if (!isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity")) {
-            console.log('Requesting: '+ id);
-            curId = id;
-            foundId.push(id);
+    function requestId(element, id) {
+        $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
+            finalizeOverlay(data.cattributes, element);
+            if (hasLocalStorage) {
+                saveStorage(id, data.cattributes);
+            }
+        });
+    }
 
-            if (element.children[0] && element.children[0].innerHTML) {
-                element.children[0].children[0].innerHTML += "<ul  style='list-style: none;' class='extBounce extAttUl'>🐈</ul>";
-                $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
-                    var ul = element.getElementsByClassName("extAttUl")[0];
-                    ul.classList.remove("extBounce");
-                    ul.innerHTML = "";
-                    for (var x in data.cattributes) {
-                        if (data.cattributes[x]) {
-                            var firstPart = "'background-color:'"+getColor(data.cattributes[x]);
-                            ul.innerHTML += "<li class='extAtt' style=\'background-color:"+getColor(data.cattributes[x])[0]+"\'>"+data.cattributes[x]+"</li>";
-                        }
-                    }
-                });
+    function finalizeOverlay(cattributes, element) {
+        var ul = element.getElementsByClassName("extAttUl")[0];
+        ul.classList.remove("extBounce");
+        ul.innerHTML = "";
+        for (var x in cattributes) {
+            if (cattributes[x]) {
+                ul.innerHTML += "<li class='extAtt' style=\'background-color:"+getColor(cattributes[x])[0]+"\'>"+cattributes[x]+"</li>";
             }
         }
-    });
+    }
+
+    function isValidId(id) {
+      return !isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity");
+    }
+
+    //Creates overlay on hover
+    function overlay() {
+        var element = $( this )[0];
+        var id = /[^/]*$/.exec(element)[0];
+        if (isValidId(id)) {
+            curId = id;
+            foundId.push(id);
+            element = window.location.hostname == 'www.cryptokitties.co' ? element.children[0].children[0] : element;
+            if (element) {
+                element.innerHTML += "<ul  style='list-style: none;' class='extBounce extAttUl'>🐈</ul>";
+                if ('id'+id in storageMyTbl) {
+                    console.log('KittyExtension: Retrieved - '+ id);
+                    finalizeOverlay(storageMyTbl['id'+id], element);
+                } else if ('id'+id in storageTbl) {
+                    console.log('KittyExtension: Retrieved - '+ id);
+                    finalizeOverlay(storageTbl['id'+id], element);
+                } else {
+                    console.log('KittyExtension: Requesting - '+ id);
+                    requestId(element, id);
+                }
+            }
+        }
+    }
+    $( "body").on( "mouseover", "a", overlay);
+
 
     //Updates attributes on specific kitty page
     setInterval(function() {
