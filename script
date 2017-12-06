@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.22
+// @version      0.26
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -22,6 +22,7 @@ $(function() {
     $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
 
+    var version = "0.26";
     var found = false;
     var foundId = [];
     var curCat = 'n/a';
@@ -36,71 +37,7 @@ $(function() {
             }
         });
     }, true);
-    var tbl = {
-        "violet": { "count": 0.0001 },
-        "googly": { "count": 0.06 },
-        "mainecoon": { "count": 0.35 },
-        "wingtips": { "count": 0.275 },
-        "jaguar": { "count": 0.2 },
-        "whixtensions": { "count": 0.49 },
-        "cerulian": { "count": 0.8 },
-        "chartreux": { "count": 0.95 },
-        "fabulous": { "count": 1.5 },
-        "gold": { "count": 1.9 },
-        "peach": { "count": 2.1 },
-        "bubblegum": { "count": 3.4 },
-        "scarlet": { "count": 4 },
-        "bloodred": { "count": 4.4 },
-        "otaku": { "count": 4 },
-        "dali": { "count": 4 },
-        "skyblue": { "count": 4.7 },
-        "emeraldgreen": { "count": 5.0 },
-        "spock": { "count": 5.3 },
-        "limegreen": { "count": 5.5 },
-        "tigerpunk": { "count": 5.5 },
-        "mauveover": { "count": 7.7 },
-        "beard": { "count": 6 },
-        "cloudwhite": { "count": 7.9 },
-        "barkbrown": { "count": 7.9 },
-        "laperm": { "count": 7.9 },
-        "calicool": { "count": 7.9 },
-        "cymric": { "count": 8.6 },
-        "chestnut": { "count": 8.8 },
-        "saycheese": { "count": 10.5 },
-        "tongue": { "count": 10.5 },
-        "shadowgrey": { "count": 14 },
-        "coffee": { "count": 14 },
-        "salmon": { "count": 14.7 },
-        "royalpurple": { "count": 15.3 },
-        "chocolate": { "count": 16.9 },
-        "swampgreen": { "count": 17 },
-        "mintgreen": { "count": 17.3 },
-        "topaz": { "count": 17.3 },
-        "lemonade": { "count": 17.4 },
-        "orangesoda": { "count": 17.4 },
-        "simple": { "count": 17.4 },
-        "sphynx": { "count": 18 },
-        "munchkin": { "count": 18 },
-        "aquamarine": { "count": 18 },
-        "raisedbrow": { "count": 18.6 },
-        "greymatter": { "count": 18.8 },
-        "happygokitty": { "count": 21 },
-        "strawberry": { "count": 21.2 },
-        "soserious": { "count": 21.6 },
-        "ragamuffin": { "count": 21.8 },
-        "sizzurp": { "count": 22.5 },
-        "himalayan": { "count": 25 },
-        "pouty": { "count": 25 },
-        "crazy": { "count": 25 },
-        "thicccbrowz": { "count": 25 },
-        "luckystripe": { "count": 25 },
-        "granitegrey": { "count": 25 },
-        "kittencream": { "count": 25 },
-        "totesbasic": { "count": 25 },
-    };
-    var hasLocalStorage = typeof(Storage) !== "undefined";
-    var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
-    var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
+    var tbl = {"violet":{"count":0},"googly":{"count":0.03},"wingtips":{"count":0.18},"jaguar":{"count":0.18},"mainecoon":{"count":0.19},"whixtensions":{"count":0.27},"cerulian":{"count":0.45},"chartreux":{"count":0.54},"fabulous":{"count":0.96},"gold":{"count":1.08},"peach":{"count":1.1},"bubblegum":{"count":2.11},"scarlet":{"count":2.26},"otaku":{"count":2.38},"dali":{"count":2.45},"bloodred":{"count":2.48},"skyblue":{"count":3},"emeraldgreen":{"count":3.25},"spock":{"count":3.35},"limegreen":{"count":3.67},"tigerpunk":{"count":3.76},"beard":{"count":4.31},"mauveover":{"count":4.39},"laperm":{"count":4.86},"cloudwhite":{"count":4.89},"calicool":{"count":4.92},"barkbrown":{"count":4.93},"cymric":{"count":5.44},"chestnut":{"count":5.55},"tongue":{"count":6.42},"saycheese":{"count":6.56},"shadowgrey":{"count":8.68},"coffee":{"count":8.7},"salmon":{"count":9.09},"royalpurple":{"count":9.42},"chocolate":{"count":10.34},"mintgreen":{"count":10.58},"swampgreen":{"count":10.6},"topaz":{"count":10.69},"orangesoda":{"count":10.73},"simple":{"count":10.74},"lemonade":{"count":10.76},"aquamarine":{"count":11.02},"raisedbrow":{"count":11.03},"munchkin":{"count":11.06},"sphynx":{"count":11.13},"greymatter":{"count":11.67},"happygokitty":{"count":13.08},"strawberry":{"count":13.09},"ragamuffin":{"count":13.34},"soserious":{"count":13.46},"sizzurp":{"count":13.69},"pouty":{"count":13.9},"himalayan":{"count":13.91},"crazy":{"count":17.51},"thicccbrowz":{"count":17.62},"luckystripe":{"count":19.65},"granitegrey":{"count":26.36},"kittencream":{"count":27.25},"totesbasic":{"count":28.59}};
 
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
@@ -115,15 +52,31 @@ $(function() {
             localStorage.setItem('kittyExtensionTbl', JSON.stringify(storageTbl));
         }
     }
+    function checkVersion(){
+        if(hasLocalStorage){
+            var savedVersion = localStorage.getItem('kittyExtensionVersion') || 0;
+            if (savedVersion !== version){
+                localStorage.setItem('kittyExtensionTbl', JSON.stringify({}));
+                localStorage.setItem('kittyExtensionMyTbl', JSON.stringify({}));
+                localStorage.setItem('kittyExtensionVersion', version);
+                console.log('New version loaded:',version);
+            }
+        }
+    }
+
+    var hasLocalStorage = typeof(Storage) !== "undefined";
+    checkVersion();
+    var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
+    var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
 
     function getColor(catt) {
         var color, count;
         if (tbl[catt]) {
             if (tbl[catt].count <= 2.5) {
                 color = "#ff8000"; // legendary
-            } else if (tbl[catt].count < 10) {
+            } else if (tbl[catt].count < 7) {
                 color = "#a335ee"; // epic
-            } else if (tbl[catt].count <= 17) {
+            } else if (tbl[catt].count <= 14) {
                 color = "#0070ff"; // rare
             } else if (tbl[catt].count <= 20) {
                 color = "white";   // common
@@ -316,8 +269,13 @@ $(function() {
         var multiplier = 1;
         var multCount = 0;
         for (var key1 in tbl) {
-            if (cattributes.includes(key1)) {
-                if (tbl[key1].count <= 2.1) {
+            if (cattributes[key1]){
+                if (tbl[key1].count <= 0.4) {
+                    multCount += 6;
+                    if (multCount > 3) {
+                        multiplier *= 1.25;
+                    }
+                } else if(tbl[key1].count <= 2.1) {
                     multCount += 3;
                     if (multCount > 3) {
                         multiplier *= 1.15;
