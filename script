@@ -121,7 +121,8 @@ $(function() {
         if(hasLocalStorage){
             var savedVersion = localStorage.getItem('kittyExtensionVersion') || 0;
             if (savedVersion !== version){
-                localStorage.clear();
+                localStorage.setItem('kittyExtensionTbl', JSON.stringify({}));
+                localStorage.setItem('kittyExtensionMyTbl', JSON.stringify({}));
                 localStorage.setItem('kittyExtensionVersion', version);
             }
         }
