@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.21
+// @version      0.22
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -19,8 +19,8 @@ $(function() {
     $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
     $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; background-color: #bbdefb; } </style>");
     $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
-    $("head").append("<style> .KittyCard { overflow: visible; } </style>");
     $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
+    $("head").append("<style> .KittyCard { overflow: visible; } </style>");
 
     var found = false;
     var foundId = [];
@@ -138,11 +138,11 @@ $(function() {
         return [color, count];
     }
 
-    function requestId(element, id, gen, fast) {
-        $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
-            finalizeOverlay(data.cattributes, element, gen, id, fast);
+    function requestId(element, stats) {
+        $.getJSON( "https://api.cryptokitties.co/kitties/"+stats.id, function( data ) {
+            finalizeOverlay(data.cattributes, element, stats);
             if (hasLocalStorage) {
-                saveStorage(id, data.cattributes);
+                saveStorage(stats.id, data.cattributes);
             }
         }).fail(function() {
             var ul = element.getElementsByClassName("extAttUl")[0];
@@ -151,7 +151,7 @@ $(function() {
         });
     }
 
-    function finalizeOverlay(cattributes, element, gen, id, fast) {
+    function finalizeOverlay(cattributes, element, stats) {
         var ul = element.getElementsByClassName("extAttUl")[0];
         ul.classList.remove("extBounce");
         ul.innerHTML = "";
@@ -162,7 +162,7 @@ $(function() {
         }
 
         if (window.location.hostname == 'www.cryptokitties.co') {
-            calcPrice(id , cattributes, gen, element, fast);
+            calcPrice(stats.id , cattributes, stats, element);
         }
     }
 
@@ -178,27 +178,30 @@ $(function() {
             curId = id;
             foundId.push(id);
             var mainSite = window.location.hostname == 'www.cryptokitties.co';
+            //console.log(nativeElement);
             var element = mainSite ? nativeElement.children[0].children[0] : nativeElement;
             if (element) {
-                var fast = false;
-                var gen = false;
+                var stats = {"id": curId, "fast":false, "gen": false, "cd": false};
+                if (element.children[1].children[0]) {
+                    stats.cd = element.children[1].children[0].innerHTML.includes("Resting");
+                }
                 if (mainSite) {
                     if (nativeElement.children[0].children[1].children[2].innerText) {
                     var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
-                    fast = cdTbl.indexOf(nativeElement.children[0].children[1].children[2].innerText);
+                    stats.fast = cdTbl.indexOf(nativeElement.children[0].children[1].children[2].innerText);
                     }
-                    gen = nativeElement.children[0].children[1].children[1].innerText.split('Gen ').pop();
+                    stats.gen = nativeElement.children[0].children[1].children[1].innerText.split('Gen ').pop();
                 }
                 element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
                 if ('id'+id in storageMyTbl) {
                     console.log('KittyExtension: Retrieved - '+ id);
-                    finalizeOverlay(storageMyTbl['id'+id], element, gen, id, fast);
+                    finalizeOverlay(storageMyTbl['id'+id], element, stats);
                 } else if ('id'+id in storageTbl) {
                     console.log('KittyExtension: Retrieved - '+ id);
-                    finalizeOverlay(storageTbl['id'+id], element, gen, id, fast);
+                    finalizeOverlay(storageTbl['id'+id], element, stats);
                 } else {
                     console.log('KittyExtension: Requesting - '+ id);
-                    requestId(element, id, gen, fast);
+                    requestId(element, stats);
                 }
             }
         }
@@ -227,31 +230,51 @@ $(function() {
         }
     }, 2000);
 
-    function calcPrice(id, cattributes, gen, element, fast) {
+    function calcPrice(id, cattributes, stats, element) {
         var base = "https://api.cryptokitties.co/auctions";
-        var query = "?type=sale&limit=2&sorting=cheap&orderBy=current_price&orderDirection=asc&sorting=cheap&status=open&search=";
-        var totalGen = ' gen:'+gen;
-        if (gen >= 10) {
-            totalGen += ' gen:'+(gen-1)+' gen:';
-            totalGen += parseInt(gen)+1;
+        var query = "?type=sale&limit=15&sorting=cheap&orderBy=current_price&orderDirection=asc&sorting=cheap&status=open&search=";
+        var totalGen = ' gen:'+stats.gen;
+        if (stats.gen >= 10) {
+            totalGen += ' gen:'+(stats.gen-1)+' gen:';
+            totalGen += parseInt(stats.gen)+1;
         }
-        var search = totalGen + getBestRares(cattributes);
+        var rareTbl = getBestRares(cattributes);
+        var search = totalGen + rareTbl[0];
 
+        function finishPrice(data, index) {
+            var newMultiplier = stats.id == data.auctions[index].kitty.id ? 1 : rareTbl[1];
+            var nomralizePrice = data.auctions[index].current_price/1000000000000000000;
+            return (nomralizePrice*newMultiplier).toFixed(2);
+        }
         $.getJSON( base+query+search, function( data ) {
             if (data.total > 0) {
                 if (data.total == 1) {
                     if (data.auctions[0].kitty.id == id) {
                         renderPrice(element, 'Name your price', query + search, false);
                     } else {
-                        renderPrice(element, (data.auctions[0].current_price/1000000000000000000).toFixed(2), query + search, true);
+                        renderPrice(element, finishPrice(data, 0), query + search, true);
                     }
                 } else {
+                    var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
+                    var cdValueTbl = ["Fast","Swift","Swift","Snappy","Snappy","Brisk","Brisk","Plodding","Plodding","Slow","Slow","Sluggish","Sluggish","Catatonic"];
                     for (var x in data.auctions) {
-                        if (data.auctions[x] && data.auctions[x].kitty.id != id) {
-                            renderPrice(element, (data.auctions[x].current_price/1000000000000000000).toFixed(2), query + search, fast < 3);
+                        var cdValue = cdTbl.indexOf(cdValueTbl[data.auctions[x].kitty.status.cooldown_index]);
+                        if (stats.cd && stats.fast > 1) {
+                            renderPrice(element, finishPrice(data, x), query + search, false);
+                            return;
+                        } else if (stats.fast > 4 ||  stats.fast >= cdValue) {
+                            renderPrice(element, finishPrice(data, x), query + search, false);
+                            return;
+                        } else if (stats.cd && data.auctions[x].kitty.status.is_ready) {
+                            renderPrice(element, finishPrice(data, x), query + search, false);
+                            return;
+                        } if (x == data.auctions.length - 1) {
+                            renderPrice(element, finishPrice(data, x), query + search, true);
                             return;
                         }
                     }
+
+
                 }
             } else {
                 renderPrice(element, 'Name your price', query + search, false);
@@ -283,24 +306,48 @@ $(function() {
         for (var x in cattributes) {
             if (!tbl[cattributes[x]]) {
                 best += ' ' + x;
-                count += 2;
+                count += 3;
                 hasRare = ' ' + x;
+            }
+        }
+        var multiplier = 1;
+        var multCount = 0;
+        for (var key1 in tbl) {
+            if (cattributes.includes(key1)) {
+                if (tbl[key1].count <= 2.1) {
+                    multCount += 3;
+                    if (multCount > 3) {
+                        multiplier *= 1.15;
+                    }
+                } else if (tbl[key1].count <= 8) {
+                    multCount += 2;
+                    if (multCount >= 6) {
+                        multiplier *= 1.05;
+                    }
+                } else if (tbl[key1].count <= 12) {
+                    multCount += 1;
+                    if (multCount >= 6) {
+                        multiplier *= 1.025;
+                    }
+                }
             }
         }
         for (var key in tbl) {
             if (cattributes.includes(key)) {
                 best += ' ' + key;
-                if (tbl[key].count <= 5) {
-                    count += 2;
+                if (tbl[key].count <= 2.1) {
+                    count += 3;
                     hasRare = ' '+key;
-                } else if (tbl[key].count <= 17) {
-                    count += 1.5;
+                } else if (tbl[key].count <= 10) {
+                    count += 2;
+                } else if (tbl[key].count <= 15) {
+                    count += 1;
                 }
             }
             if (count >= 3) {
-                return ' ' + best;
+                return [' ' + best, multiplier];
             }
         }
-        return hasRare ? hasRare : '';
+        return [hasRare ? hasRare : '', multiplier];
     }
 });
