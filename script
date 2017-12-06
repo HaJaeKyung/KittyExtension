@@ -118,10 +118,10 @@ $(function() {
     }
     function checkVersion(){
         if(hasLocalStorage){
-            var savedVersion = localStorage.getItem('kittyPluginVersion');
-            if (kittyPluginVersion !== version){
+            var savedVersion = localStorage.getItem('kittyExtensionVersion') || 0;
+            if (savedVersion !== version){
                 localStorage.clear();
-                localStorage.setItem('kittyPluginVersion', version);
+                localStorage.setItem('kittyExtensionVersion', version);
             }
         }
     }
