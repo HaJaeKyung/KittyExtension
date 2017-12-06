@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
-// @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.21
+// @namespace    https://github.com/HaJaeKyung/CryptoCatAdd
+// @version      0.20
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -10,17 +10,11 @@
 // @require      http://code.jquery.com/jquery-3.2.1.min.js
 // ==/UserScript==
 
-document.searchSimilarKitties = function(e, query) {
-    e.preventDefault();
-    window.location.href = "https://www.cryptokitties.co/marketplace/sale" + query;
-};
 $(function() {
     console.log('CryptoKitties Extension Loaded');
-    $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
-    $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; background-color: #bbdefb; } </style>");
+    $("head").append("<style> .extAttUl{ overflow: visible; z-index: 3; position:absolute; bottom: 0; right: 0; padding: 0px; margin: 0px;} .extAtt{ padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; }</style>");
     $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
-    $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
 
     var found = false;
     var foundId = [];
@@ -37,7 +31,6 @@ $(function() {
         });
     }, true);
     var tbl = {
-        "violet": { "count": 0.0001 },
         "googly": { "count": 0.06 },
         "mainecoon": { "count": 0.35 },
         "wingtips": { "count": 0.275 },
@@ -48,8 +41,8 @@ $(function() {
         "fabulous": { "count": 1.5 },
         "gold": { "count": 1.9 },
         "peach": { "count": 2.1 },
-        "bubblegum": { "count": 3.4 },
         "scarlet": { "count": 4 },
+        "bubblegum": { "count": 3.4 },
         "bloodred": { "count": 4.4 },
         "otaku": { "count": 4 },
         "dali": { "count": 4 },
@@ -60,10 +53,10 @@ $(function() {
         "tigerpunk": { "count": 5.5 },
         "mauveover": { "count": 7.7 },
         "beard": { "count": 6 },
-        "cloudwhite": { "count": 7.9 },
         "barkbrown": { "count": 7.9 },
         "laperm": { "count": 7.9 },
         "calicool": { "count": 7.9 },
+        "cloudwhite": { "count": 7.9 },
         "cymric": { "count": 8.6 },
         "chestnut": { "count": 8.8 },
         "saycheese": { "count": 10.5 },
@@ -138,9 +131,9 @@ $(function() {
         return [color, count];
     }
 
-    function requestId(element, id, gen, fast) {
+    function requestId(element, id) {
         $.getJSON( "https://api.cryptokitties.co/kitties/"+id, function( data ) {
-            finalizeOverlay(data.cattributes, element, gen, id, fast);
+            finalizeOverlay(data.cattributes, element);
             if (hasLocalStorage) {
                 saveStorage(id, data.cattributes);
             }
@@ -151,7 +144,7 @@ $(function() {
         });
     }
 
-    function finalizeOverlay(cattributes, element, gen, id, fast) {
+    function finalizeOverlay(cattributes, element) {
         var ul = element.getElementsByClassName("extAttUl")[0];
         ul.classList.remove("extBounce");
         ul.innerHTML = "";
@@ -160,10 +153,6 @@ $(function() {
                 ul.innerHTML += "<li class='extAtt' style=\'background-color:"+getColor(cattributes[x])[0]+"\'>"+cattributes[x]+"</li>";
             }
         }
-
-        if (window.location.hostname == 'www.cryptokitties.co') {
-            calcPrice(id , cattributes, gen, element, fast);
-        }
     }
 
     function isValidId(id) {
@@ -171,39 +160,56 @@ $(function() {
     }
 
     //Creates overlay on hover
-    function overlay() {
-        var nativeElement = $( this )[0];
-        var id = /[^/]*$/.exec(nativeElement)[0];
+    function overlay(element) {
+        //var element = $( this )[0];
+        var id = /[^/]*$/.exec(element)[0];
+        debugger;
         if (isValidId(id)) {
             curId = id;
             foundId.push(id);
-            var mainSite = window.location.hostname == 'www.cryptokitties.co';
-            var element = mainSite ? nativeElement.children[0].children[0] : nativeElement;
+            element = window.location.hostname == 'www.cryptokitties.co' ? element.children[0].children[0] : element;
             if (element) {
-                var fast = false;
-                var gen = false;
-                if (mainSite) {
-                    if (nativeElement.children[0].children[1].children[2].innerText) {
-                    var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
-                    fast = cdTbl.indexOf(nativeElement.children[0].children[1].children[2].innerText);
-                    }
-                    gen = nativeElement.children[0].children[1].children[1].innerText.split('Gen ').pop();
-                }
-                element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
+                element.innerHTML += "<ul  style='list-style: none;' class='extBounce extAttUl'>🐈</ul>";
                 if ('id'+id in storageMyTbl) {
                     console.log('KittyExtension: Retrieved - '+ id);
-                    finalizeOverlay(storageMyTbl['id'+id], element, gen, id, fast);
+                    finalizeOverlay(storageMyTbl['id'+id], element);
                 } else if ('id'+id in storageTbl) {
                     console.log('KittyExtension: Retrieved - '+ id);
-                    finalizeOverlay(storageTbl['id'+id], element, gen, id, fast);
+                    finalizeOverlay(storageTbl['id'+id], element);
                 } else {
                     console.log('KittyExtension: Requesting - '+ id);
-                    requestId(element, id, gen, fast);
+                    requestId(element, id);
                 }
             }
         }
     }
-    $( "body").on( "mouseover", "a", overlay);
+
+    //Creates overlay on hover
+    function overlay2() {
+        var element = $( this )[0];
+        var id = /[^/]*$/.exec(element)[0];
+        debugger;
+        if (isValidId(id)) {
+            curId = id;
+            foundId.push(id);
+            element = window.location.hostname == 'www.cryptokitties.co' ? element.children[0].children[0] : element;
+            if (element) {
+                element.innerHTML += "<ul  style='list-style: none;' class='extBounce extAttUl'>🐈</ul>";
+                if ('id'+id in storageMyTbl) {
+                    console.log('KittyExtension: Retrieved - '+ id);
+                    finalizeOverlay(storageMyTbl['id'+id], element);
+                } else if ('id'+id in storageTbl) {
+                    console.log('KittyExtension: Retrieved - '+ id);
+                    finalizeOverlay(storageTbl['id'+id], element);
+                } else {
+                    console.log('KittyExtension: Requesting - '+ id);
+                    requestId(element, id);
+                }
+            }
+        }
+    }
+    console.log('CryptoKitties Extension adding listener');
+    $( "body").on( "mouseover", "a", overlay2);
 
     //Updates attributes on specific kitty page
     setInterval(function() {
@@ -227,80 +233,19 @@ $(function() {
         }
     }, 2000);
 
-    function calcPrice(id, cattributes, gen, element, fast) {
-        var base = "https://api.cryptokitties.co/auctions";
-        var query = "?type=sale&limit=2&sorting=cheap&orderBy=current_price&orderDirection=asc&sorting=cheap&status=open&search=";
-        var totalGen = ' gen:'+gen;
-        if (gen >= 10) {
-            totalGen += ' gen:'+(gen-1)+' gen:';
-            totalGen += parseInt(gen)+1;
-        }
-        var search = totalGen + getBestRares(cattributes);
-
-        $.getJSON( base+query+search, function( data ) {
-            if (data.total > 0) {
-                if (data.total == 1) {
-                    if (data.auctions[0].kitty.id == id) {
-                        renderPrice(element, 'Name your price', query + search, false);
-                    } else {
-                        renderPrice(element, (data.auctions[0].current_price/1000000000000000000).toFixed(2), query + search, true);
-                    }
-                } else {
-                    for (var x in data.auctions) {
-                        if (data.auctions[x] && data.auctions[x].kitty.id != id) {
-                            renderPrice(element, (data.auctions[x].current_price/1000000000000000000).toFixed(2), query + search, fast < 3);
-                            return;
-                        }
-                    }
-                }
-            } else {
-                renderPrice(element, 'Name your price', query + search, false);
+    //Auto load the overlays
+    $( document ).ready(function() {
+    
+        function update(){
+            var kitties = document.getElementsByClassName('KittiesGrid-item');
+            for(var i=0; i<kitties.length; i++){
+                overlay(kitties[i].childNodes[0]);
             }
-        }).fail(function() {
-
-        });
-    }
-
-    function renderPrice(element, price, url, fast) {
-        if (price >= 50) {
-            price = Math.ceil(price / 10) * 10;
-            price += '+';
-        } else if (fast) {
-            price += '+';
+            //Keep updating for SPA Page changes
+            setTimeout(update, 500);
         }
-        var ul = element.getElementsByClassName("extWrapper")[0];
-        ul.innerHTML += "<ul class='extAttUl' onclick='searchSimilarKitties(event, &quot;"+ url +"&quot;)'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>value:</span> " + price + "</li></ul>";
-    }
 
-    function getBestRares(cattributes, adjust) {
-        var best = '';
-        var hasRare = false;
-        var count = adjust || 0;
-
-        if (cattributes.length === 0) {
-            hasRare = ' type:fancy';
-        }
-        for (var x in cattributes) {
-            if (!tbl[cattributes[x]]) {
-                best += ' ' + x;
-                count += 2;
-                hasRare = ' ' + x;
-            }
-        }
-        for (var key in tbl) {
-            if (cattributes.includes(key)) {
-                best += ' ' + key;
-                if (tbl[key].count <= 5) {
-                    count += 2;
-                    hasRare = ' '+key;
-                } else if (tbl[key].count <= 17) {
-                    count += 1.5;
-                }
-            }
-            if (count >= 3) {
-                return ' ' + best;
-            }
-        }
-        return hasRare ? hasRare : '';
-    }
+        //Give the page some time to load
+        setTimeout(update, 500);
+    });
 });
