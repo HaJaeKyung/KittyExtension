@@ -21,7 +21,7 @@ $(function() {
     $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
     $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
-
+    var version = "0.21";
     var found = false;
     var foundId = [];
     var curCat = 'n/a';
@@ -101,6 +101,7 @@ $(function() {
     var hasLocalStorage = typeof(Storage) !== "undefined";
     var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
     var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
+    checkVersion();
 
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
@@ -115,7 +116,15 @@ $(function() {
             localStorage.setItem('kittyExtensionTbl', JSON.stringify(storageTbl));
         }
     }
-
+    function checkVersion(){
+        if(hasLocalStorage){
+            var savedVersion = localStorage.getItem('kittyPluginVersion');
+            if (kittyPluginVersion !== version){
+                localStorage.clear();
+                localStorage.setItem('kittyPluginVersion', version);
+            }
+        }
+    }
     function getColor(catt) {
         var color, count;
         if (tbl[catt]) {
