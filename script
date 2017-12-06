@@ -16,6 +16,7 @@ document.searchSimilarKitties = function(e, query) {
 };
 $(function() {
     console.log('CryptoKitties Extension Loaded');
+
     $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
     $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; background-color: #bbdefb; } </style>");
     $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
@@ -98,6 +99,24 @@ $(function() {
         "kittencream": { "count": 25 },
         "totesbasic": { "count": 25 },
     };
+    // Get around “No Access-Control-Allow-Origin header” problems https://stackoverflow.com/questions/43871637
+    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+    const cattributesUrl = "https://cryptokittydex.com/cattributes";
+    fetch(proxyUrl + cattributesUrl, {
+        method: "get"
+    }).then(response => response.text()
+    ).then(function(contents) {
+        var cattributesList = $.parseHTML(contents)[20].children[0].children[0].children[1];
+        var cattributeFrequency = {};
+        for (var i = 0; i < cattributesList.children.length; i++) {
+            var cattributeName = cattributesList.children[i].children[1].children[0].textContent;
+            var cattributeAmount = parseFloat(cattributesList.children[i].children[0].style.width.replace(/[^0-9\.]/g, ''), 10);
+            cattributeFrequency[cattributeName] = { "count": Math.round(cattributeAmount * 100.0) / 100.0 };
+        }
+        tbl = cattributeFrequency;
+        console.log("Cattribute frequency successfully fetched");
+    }).catch(() => console.log("Can't access " + cattributesUrl + " response. Blocked by brower?"));
+
     var hasLocalStorage = typeof(Storage) !== "undefined";
     var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
     var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
