@@ -120,15 +120,15 @@ $(function() {
         var color, count;
         if (tbl[catt]) {
             if (tbl[catt].count <= 2.5) {
-                color = "#EC7063";
+                color = "#ff8000"; // legendary
             } else if (tbl[catt].count < 10) {
-                color = "#F7DC6F";
+                color = "#a335ee"; // epic
             } else if (tbl[catt].count <= 17) {
-                color = "#48C9B0";
+                color = "#0070ff"; // rare
             } else if (tbl[catt].count <= 20) {
-                color = "white";
+                color = "white";   // common
             } else {
-                color = "white";
+                color = "white";   // common
             }
             count = tbl[catt].count <= 20 ? " ("+ tbl[catt].count +"%)" : " (20%+)";
         } else {
@@ -157,7 +157,9 @@ $(function() {
         ul.innerHTML = "";
         for (var x in cattributes) {
             if (cattributes[x]) {
-                ul.innerHTML += "<li class='extAtt' style=\'background-color:"+getColor(cattributes[x])[0]+"\'>"+cattributes[x]+"</li>";
+                var background_color = getColor(cattributes[x].description)[0];
+                var color = background_color == 'white' ? '#000' : '#fff';
+                ul.innerHTML += "<li class='extAtt' style=\'background-color:"+background_color+"; color: "+color+"\'>"+cattributes[x].description+"</li>";
             }
         }
 
@@ -223,6 +225,7 @@ $(function() {
                         var color = arr[0];
                         var num = arr[1];
                         cattributes[att].style.backgroundColor = color;
+                        cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
                         cattributes[att].innerHTML += num;
                     }
                 }
