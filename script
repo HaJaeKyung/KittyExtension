@@ -306,17 +306,18 @@ $(function() {
 
     //Auto load the overlays
     $( document ).ready(function() {
-    
-        function update(){
-            var kitties = document.getElementsByClassName('KittiesGrid-item');
-            for(var i=0; i<kitties.length; i++){
-                overlay(kitties[i].childNodes[0]);
+
+        let update = function(){
+            if(document.getElementsByClassName('.extWrapper').length == 0){
+                var kitties = document.getElementsByClassName('KittiesGrid-item');
+                for(var i=0; i<kitties.length; i++){
+                    overlay(kitties[i].childNodes[0]);
+                }
             }
-            //Keep updating for SPA Page changes
-            setTimeout(update, 500);
-        }
+            setTimeout(update, 1500);
+        };
 
         //Give the page some time to load
-        setTimeout(update, 500);
+        setTimeout(update, 1500);
     });
 });
