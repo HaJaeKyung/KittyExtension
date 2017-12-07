@@ -38,6 +38,55 @@ $(document).ready(function() {
         });
     }, true);
     var tbl = {"violet":{"count":0},"googly":{"count":0.03},"wingtips":{"count":0.18},"jaguar":{"count":0.18},"mainecoon":{"count":0.19},"whixtensions":{"count":0.27},"cerulian":{"count":0.45},"chartreux":{"count":0.54},"fabulous":{"count":0.96},"gold":{"count":1.08},"peach":{"count":1.1},"bubblegum":{"count":2.11},"scarlet":{"count":2.26},"otaku":{"count":2.38},"dali":{"count":2.45},"bloodred":{"count":2.48},"skyblue":{"count":3},"emeraldgreen":{"count":3.25},"spock":{"count":3.35},"limegreen":{"count":3.67},"tigerpunk":{"count":3.76},"beard":{"count":4.31},"mauveover":{"count":4.39},"laperm":{"count":4.86},"cloudwhite":{"count":4.89},"calicool":{"count":4.92},"barkbrown":{"count":4.93},"cymric":{"count":5.44},"chestnut":{"count":5.55},"tongue":{"count":6.42},"saycheese":{"count":6.56},"shadowgrey":{"count":8.68},"coffee":{"count":8.7},"salmon":{"count":9.09},"royalpurple":{"count":9.42},"chocolate":{"count":10.34},"mintgreen":{"count":10.58},"swampgreen":{"count":10.6},"topaz":{"count":10.69},"orangesoda":{"count":10.73},"simple":{"count":10.74},"lemonade":{"count":10.76},"aquamarine":{"count":11.02},"raisedbrow":{"count":11.03},"munchkin":{"count":11.06},"sphynx":{"count":11.13},"greymatter":{"count":11.67},"happygokitty":{"count":13.08},"strawberry":{"count":13.09},"ragamuffin":{"count":13.34},"soserious":{"count":13.46},"sizzurp":{"count":13.69},"pouty":{"count":13.9},"himalayan":{"count":13.91},"crazy":{"count":17.51},"thicccbrowz":{"count":17.62},"luckystripe":{"count":19.65},"granitegrey":{"count":26.36},"kittencream":{"count":27.25},"totesbasic":{"count":28.59}};
+    function fetchCattributeFrequency() {
+        if (hasLocalStorage) {
+            var lastFetchTime = localStorage.getItem("lastFetchTime") || 0;
+            var lastFetchTbl = JSON.parse(localStorage.getItem("cattributeFrequency")) || 0;
+            var now = new Date().getTime();
+            // Fetch cattribute frequency if last fetch was over 12 hours ago, or we have not fetched before
+            if (Math.floor((now - lastFetchTime) / 3600000) > 12 || !lastFetchTbl) {
+                // Get around “No Access-Control-Allow-Origin header” problems https://stackoverflow.com/questions/43871637
+                const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+                const cattributesUrl = "https://cryptokittydex.com/cattributes";
+                fetch(proxyUrl + cattributesUrl, {
+                    method: "get"
+                }).then(response => response.text()
+                ).then(function(contents) {
+                    var cattributesList = $.parseHTML(contents)[20].children[0].children[0].children[1];
+                    var cattributeFrequency = {};
+                    for (var i = 0; i < cattributesList.children.length; i++) {
+                        var cattributeName = cattributesList.children[i].children[1].children[0].textContent;
+                        var cattributeAmount = parseFloat(cattributesList.children[i].children[0].style.width.replace(/[^0-9\.]/g, ''), 10);
+                        cattributeFrequency[cattributeName] = { "count": Math.round(cattributeAmount * 100.0) / 100.0 };
+                    }
+                    tbl = cattributeFrequency;
+                    console.log(tbl);
+                    if (document.getElementsByClassName("ListAttributes-item").length > 0) {
+                        var cattributes = document.getElementsByClassName("ListAttributes-item");
+                        for (var att in cattributes) {
+                            if (cattributes[att].style) {
+                                // This is reading the cattributes after the percentages are already written using the harded coded tbl
+                                // So we split at the string and extract the first part
+                                var catt = cattributes[att].innerText.split(" ")[0];
+                                var arr = getColor(catt);
+                                var color = arr[0];
+                                var num = arr[1];
+                                // Update the cattribute colors and replace the older percentage with the new one
+                                cattributes[att].style.backgroundColor = color;
+                                cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
+                                cattributes[att].innerText = cattributes[att].innerText.replace(/\((.+?)\)/g, num);
+                            }
+                        }
+                    }
+                    localStorage.setItem('lastFetchTime', now);
+                    localStorage.setItem('cattributeFrequency', JSON.stringify(cattributeFrequency));
+                    console.log("Cattribute frequency successfully fetched");
+                }).catch(() => console.log("Can't access " + cattributesUrl + " response. Blocked by brower?"));
+            } else {
+                tbl = lastFetchTbl;
+            }
+        }
+    }
 
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
@@ -66,6 +115,7 @@ $(document).ready(function() {
 
     var hasLocalStorage = typeof(Storage) !== "undefined";
     checkVersion();
+    fetchCattributeFrequency();
     var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
     var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
 
