@@ -11,331 +11,365 @@
 // ==/UserScript==
 
 document.searchSimilarKitties = function(e, query) {
-    e.preventDefault();
-    window.location.href = "https://www.cryptokitties.co/marketplace/sale" + query;
+  e.preventDefault();
+  window.location.href = "https://www.cryptokitties.co/marketplace/sale" + query;
 };
 $(function() {
-    console.log('CryptoKitties Extension Loaded');
+  console.log('CryptoKitties Extension Loaded');
 
-    $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
-    $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; background-color: #a7ffeb; } </style>");
-    $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
-    $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
-    $("head").append("<style> .KittyCard { overflow: visible; } </style>");
+  $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
+  $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; background-color: #a7ffeb; } </style>");
+  $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
+  $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
+  $("head").append("<style> .KittyCard { overflow: visible; } </style>");
 
-    var version = "0.27";
-    var found = false;
-    var foundId = [];
-    var curCat = 'n/a';
-    var curId = 'n/a';
-    var url = location.href;
-    document.body.addEventListener('click', function() {
-        requestAnimationFrame(function() {
-            if (url!==location.href) {
-                //Clears id cache on page change
-                foundId = [];
-                url = location.href;
-            }
-        });
-    }, true);
-    var tbl = {"violet":{"count":0},"googly":{"count":0.03},"wingtips":{"count":0.18},"jaguar":{"count":0.18},"mainecoon":{"count":0.19},"whixtensions":{"count":0.27},"cerulian":{"count":0.45},"chartreux":{"count":0.54},"fabulous":{"count":0.96},"gold":{"count":1.08},"peach":{"count":1.1},"bubblegum":{"count":2.11},"scarlet":{"count":2.26},"otaku":{"count":2.38},"dali":{"count":2.45},"bloodred":{"count":2.48},"skyblue":{"count":3},"emeraldgreen":{"count":3.25},"spock":{"count":3.35},"limegreen":{"count":3.67},"tigerpunk":{"count":3.76},"beard":{"count":4.31},"mauveover":{"count":4.39},"laperm":{"count":4.86},"cloudwhite":{"count":4.89},"calicool":{"count":4.92},"barkbrown":{"count":4.93},"cymric":{"count":5.44},"chestnut":{"count":5.55},"tongue":{"count":6.42},"saycheese":{"count":6.56},"shadowgrey":{"count":8.68},"coffee":{"count":8.7},"salmon":{"count":9.09},"royalpurple":{"count":9.42},"chocolate":{"count":10.34},"mintgreen":{"count":10.58},"swampgreen":{"count":10.6},"topaz":{"count":10.69},"orangesoda":{"count":10.73},"simple":{"count":10.74},"lemonade":{"count":10.76},"aquamarine":{"count":11.02},"raisedbrow":{"count":11.03},"munchkin":{"count":11.06},"sphynx":{"count":11.13},"greymatter":{"count":11.67},"happygokitty":{"count":13.08},"strawberry":{"count":13.09},"ragamuffin":{"count":13.34},"soserious":{"count":13.46},"sizzurp":{"count":13.69},"pouty":{"count":13.9},"himalayan":{"count":13.91},"crazy":{"count":17.51},"thicccbrowz":{"count":17.62},"luckystripe":{"count":19.65},"granitegrey":{"count":26.36},"kittencream":{"count":27.25},"totesbasic":{"count":28.59}};
-    // Get around “No Access-Control-Allow-Origin header” problems https://stackoverflow.com/questions/43871637
-    const proxyUrl = "https://cors-anywhere.herokuapp.com/";
-    const cattributesUrl = "https://cryptokittydex.com/cattributes";
-    fetch(proxyUrl + cattributesUrl, {
-        method: "get"
-    }).then(response => response.text()
-    ).then(function(contents) {
-        var cattributesList = $.parseHTML(contents)[20].children[0].children[0].children[1];
-        var cattributeFrequency = {};
-        for (var i = 0; i < cattributesList.children.length; i++) {
-            var cattributeName = cattributesList.children[i].children[1].children[0].textContent;
-            var cattributeAmount = parseFloat(cattributesList.children[i].children[0].style.width.replace(/[^0-9\.]/g, ''), 10);
-            cattributeFrequency[cattributeName] = { "count": Math.round(cattributeAmount * 100.0) / 100.0 };
-        }
-        tbl = cattributeFrequency;
-        console.log("Cattribute frequency successfully fetched");
-    }).catch(() => console.log("Can't access " + cattributesUrl + " response. Blocked by brower?"));
+  var version = "0.27";
+  var found = false;
+  var foundId = [];
+  var curCat = 'n/a';
+  var curId = 'n/a';
+  var url = location.href;
+  document.body.addEventListener('click', function() {
+      requestAnimationFrame(function() {
+          if (url!==location.href) {
+              //Clears id cache on page change
+              foundId = [];
+              url = location.href;
+          }
+      });
+  }, true);
+  var tbl = {"violet":{"count":0},"googly":{"count":0.03},"wingtips":{"count":0.18},"jaguar":{"count":0.18},"mainecoon":{"count":0.19},"whixtensions":{"count":0.27},"cerulian":{"count":0.45},"chartreux":{"count":0.54},"fabulous":{"count":0.96},"gold":{"count":1.08},"peach":{"count":1.1},"bubblegum":{"count":2.11},"scarlet":{"count":2.26},"otaku":{"count":2.38},"dali":{"count":2.45},"bloodred":{"count":2.48},"skyblue":{"count":3},"emeraldgreen":{"count":3.25},"spock":{"count":3.35},"limegreen":{"count":3.67},"tigerpunk":{"count":3.76},"beard":{"count":4.31},"mauveover":{"count":4.39},"laperm":{"count":4.86},"cloudwhite":{"count":4.89},"calicool":{"count":4.92},"barkbrown":{"count":4.93},"cymric":{"count":5.44},"chestnut":{"count":5.55},"tongue":{"count":6.42},"saycheese":{"count":6.56},"shadowgrey":{"count":8.68},"coffee":{"count":8.7},"salmon":{"count":9.09},"royalpurple":{"count":9.42},"chocolate":{"count":10.34},"mintgreen":{"count":10.58},"swampgreen":{"count":10.6},"topaz":{"count":10.69},"orangesoda":{"count":10.73},"simple":{"count":10.74},"lemonade":{"count":10.76},"aquamarine":{"count":11.02},"raisedbrow":{"count":11.03},"munchkin":{"count":11.06},"sphynx":{"count":11.13},"greymatter":{"count":11.67},"happygokitty":{"count":13.08},"strawberry":{"count":13.09},"ragamuffin":{"count":13.34},"soserious":{"count":13.46},"sizzurp":{"count":13.69},"pouty":{"count":13.9},"himalayan":{"count":13.91},"crazy":{"count":17.51},"thicccbrowz":{"count":17.62},"luckystripe":{"count":19.65},"granitegrey":{"count":26.36},"kittencream":{"count":27.25},"totesbasic":{"count":28.59}};
 
-    var hasLocalStorage = typeof(Storage) !== "undefined";
-    var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
-    var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
+  var hasLocalStorage = typeof(Storage) !== "undefined";
+  var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
+  var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
 
-    function saveStorage(id, cattributes) {
-        if (window.location.pathname == "/my-kitties") {
-            storageMyTbl['id'+id] = cattributes;
-            localStorage.setItem('kittyExtensionMyTbl', JSON.stringify(storageMyTbl));
-        } else {
-            storageTbl['id'+id] = cattributes;
-            if (Object.keys(storageTbl).length > 1000) {
-                for (var first in storageTbl) break;
-                delete storageTbl[first];
-            }
-            localStorage.setItem('kittyExtensionTbl', JSON.stringify(storageTbl));
-        }
-    }
-    function checkVersion(){
-        if(hasLocalStorage){
-            var savedVersion = localStorage.getItem('kittyExtensionVersion') || 0;
-            if (savedVersion !== version){
-                localStorage.setItem('kittyExtensionTbl', JSON.stringify({}));
-                localStorage.setItem('kittyExtensionMyTbl', JSON.stringify({}));
-                localStorage.setItem('kittyExtensionVersion', version);
-                console.log('New version loaded:',version);
-            }
-        }
-    }
+  function fetchCattributeFrequency() {
+      if (hasLocalStorage) {
+          var lastFetchTime = localStorage.getItem("lastFetchTime") || 0;
+          var lastFetchTbl = JSON.parse(localStorage.getItem("cattributeFrequency")) || 0;
+          var now = new Date().getTime();
+          // Fetch cattribute frequency if last fetch was over 12 hours ago, or we have not fetched before
+          if (Math.floor((now - lastFetchTime) / 3600000) > 12 || !lastFetchTbl) {
+              // Get around “No Access-Control-Allow-Origin header” problems https://stackoverflow.com/questions/43871637
+              const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+              const cattributesUrl = "https://cryptokittydex.com/cattributes";
+              fetch(proxyUrl + cattributesUrl, {
+                  method: "get"
+              }).then(response => response.text()
+                     ).then(function(contents) {
+                  var cattributesList = $.parseHTML(contents)[20].children[0].children[0].children[1];
+                  var cattributeFrequency = {};
+                  for (var i = 0; i < cattributesList.children.length; i++) {
+                      var cattributeName = cattributesList.children[i].children[1].children[0].textContent;
+                      var cattributeAmount = parseFloat(cattributesList.children[i].children[0].style.width.replace(/[^0-9\.]/g, ''), 10);
+                      cattributeFrequency[cattributeName] = { "count": Math.round(cattributeAmount * 100.0) / 100.0 };
+                  }
+                  tbl = cattributeFrequency;
+                  console.log(tbl);
+                  if (document.getElementsByClassName("ListAttributes-item").length > 0) {
+                      var cattributes = document.getElementsByClassName("ListAttributes-item");
+                      for (var att in cattributes) {
+                          if (cattributes[att].style) {
+                              // This is reading the cattributes after the percentages are already written using the harded coded tbl
+                              // So we split at the string and extract the first part
+                              var catt = cattributes[att].innerText.split(" ")[0];
+                              var arr = getColor(catt);
+                              var color = arr[0];
+                              var num = arr[1];
+                              // Update the cattribute colors and replace the older percentage with the new one
+                              cattributes[att].style.backgroundColor = color;
+                              cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
+                              cattributes[att].innerText = cattributes[att].innerText.replace(/\((.+?)\)/g, num);
+                          }
+                      }
+                  }
+                  localStorage.setItem('lastFetchTime', now);
+                  localStorage.setItem('cattributeFrequency', JSON.stringify(cattributeFrequency));
+                  console.log("Cattribute frequency successfully fetched");
+              }).catch(() => console.log("Can't access " + cattributesUrl + " response. Blocked by brower?"));
+          } else {
+              tbl = lastFetchTbl;
+          }
+      }
+  }
 
-    var hasLocalStorage = typeof(Storage) !== "undefined";
-    checkVersion();
-    var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
-    var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
+  function saveStorage(id, cattributes) {
+      if (window.location.pathname == "/my-kitties") {
+          storageMyTbl['id'+id] = cattributes;
+          localStorage.setItem('kittyExtensionMyTbl', JSON.stringify(storageMyTbl));
+      } else {
+          storageTbl['id'+id] = cattributes;
+          if (Object.keys(storageTbl).length > 1000) {
+              for (var first in storageTbl) break;
+              delete storageTbl[first];
+          }
+          localStorage.setItem('kittyExtensionTbl', JSON.stringify(storageTbl));
+      }
+  }
+  function checkVersion(){
+      if(hasLocalStorage){
+          var savedVersion = localStorage.getItem('kittyExtensionVersion') || 0;
+          if (savedVersion !== version){
+              localStorage.setItem('kittyExtensionTbl', JSON.stringify({}));
+              localStorage.setItem('kittyExtensionMyTbl', JSON.stringify({}));
+              localStorage.setItem('kittyExtensionVersion', version);
+              console.log('New version loaded:',version);
+          }
+      }
+  }
 
-    function getColor(catt) {
-        var color, count;
-        if (tbl[catt]) {
-            if (tbl[catt].count <= 1.2) {
-                color = "#ff8000"; // legendary
-            } else if (tbl[catt].count < 5) {
-                color = "#a335ee"; // epic
-            } else if (tbl[catt].count <= 10.5) {
-                color = "#0070ff"; // rare
-            } else if (tbl[catt].count <= 20) {
-                color = "white";   // common
-            } else {
-                color = "white";   // common
-            }
-            count = tbl[catt].count <= 20 ? " ("+ tbl[catt].count +"%)" : " (20%+)";
-        } else {
-            color = "#f1cbff";
-            count = " (Ultra%)";
-        }
-        return [color, count];
-    }
+  var hasLocalStorage = typeof(Storage) !== "undefined";
+  checkVersion();
+  fetchCattributeFrequency();
+  var storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
+  var storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
 
-    function requestId(element, stats) {
-        $.getJSON( "https://api.cryptokitties.co/kitties/"+stats.id, function( data ) {
-            finalizeOverlay(data.cattributes, element, stats);
-            if (hasLocalStorage) {
-                saveStorage(stats.id, data.cattributes);
-            }
-        }).fail(function() {
-            var ul = element.getElementsByClassName("extAttUl")[0];
-            ul.classList.remove("extBounce");
-            ul.innerHTML = "😿";
-        });
-    }
+  function getColor(catt) {
+      var color, count;
+      if (tbl[catt]) {
+          if (tbl[catt].count <= 1.2) {
+              color = "#ff8000"; // legendary
+          } else if (tbl[catt].count < 5) {
+              color = "#a335ee"; // epic
+          } else if (tbl[catt].count <= 10.5) {
+              color = "#0070ff"; // rare
+          } else if (tbl[catt].count <= 20) {
+              color = "white";   // common
+          } else {
+              color = "white";   // common
+          }
+          count = tbl[catt].count <= 20 ? " ("+ tbl[catt].count +"%)" : " (20%+)";
+      } else {
+          color = "#f1cbff";
+          count = " (Ultra%)";
+      }
+      return [color, count];
+  }
 
-    function finalizeOverlay(cattributes, element, stats) {
-        var ul = element.getElementsByClassName("extAttUl")[0];
-        ul.classList.remove("extBounce");
-        ul.innerHTML = "";
-        for (var x in cattributes) {
-            if (cattributes[x]) {
-                var background_color = getColor(cattributes[x].description)[0];
-                var color = background_color == 'white' ? '#000' : '#fff';
-                ul.innerHTML += "<li class='extAtt' style=\'background-color:"+background_color+"; color: "+color+"\'>"+cattributes[x].description+"</li>";
-            }
-        }
+  function requestId(element, stats) {
+      $.getJSON( "https://api.cryptokitties.co/kitties/"+stats.id, function( data ) {
+          finalizeOverlay(data.cattributes, element, stats);
+          if (hasLocalStorage) {
+              saveStorage(stats.id, data.cattributes);
+          }
+      }).fail(function() {
+          var ul = element.getElementsByClassName("extAttUl")[0];
+          ul.classList.remove("extBounce");
+          ul.innerHTML = "😿";
+      });
+  }
 
-        if (window.location.hostname == 'www.cryptokitties.co') {
-            calcPrice(stats.id , cattributes, stats, element);
-        }
-    }
+  function finalizeOverlay(cattributes, element, stats) {
+      var ul = element.getElementsByClassName("extAttUl")[0];
+      ul.classList.remove("extBounce");
+      ul.innerHTML = "";
+      for (var x in cattributes) {
+          if (cattributes[x]) {
+              var background_color = getColor(cattributes[x].description)[0];
+              var color = background_color == 'white' ? '#000' : '#fff';
+              ul.innerHTML += "<li class='extAtt' style=\'background-color:"+background_color+"; color: "+color+"\'>"+cattributes[x].description+"</li>";
+          }
+      }
 
-    function isValidId(id) {
-      return !isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity");
-    }
+      if (window.location.hostname == 'www.cryptokitties.co') {
+          calcPrice(stats.id , cattributes, stats, element);
+      }
+  }
 
-    //Creates overlay on hover
-    function overlay() {
-        var nativeElement = $( this )[0];
-        var id = /[^/]*$/.exec(nativeElement)[0];
-        if (isValidId(id)) {
-            curId = id;
-            foundId.push(id);
-            var mainSite = window.location.hostname == 'www.cryptokitties.co';
-            //console.log(nativeElement);
-            var element = mainSite ? nativeElement.children[0].children[0] : nativeElement;
-            if (element) {
-                var stats = {"id": curId, "fast":false, "gen": false, "cd": false};
-                if (element.children[1].children[0]) {
-                    stats.cd = element.children[1].children[0].innerHTML.includes("Resting");
-                }
-                if (mainSite) {
-                    if (nativeElement.children[0].children[1].children[2].innerText) {
-                    var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
-                    stats.fast = cdTbl.indexOf(nativeElement.children[0].children[1].children[2].innerText);
-                    }
-                    stats.gen = nativeElement.children[0].children[1].children[1].innerText.split('Gen ').pop();
-                }
-                element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
-                if ('id'+id in storageMyTbl) {
-                    console.log('KittyExtension: Retrieved - '+ id);
-                    finalizeOverlay(storageMyTbl['id'+id], element, stats);
-                } else if ('id'+id in storageTbl) {
-                    console.log('KittyExtension: Retrieved - '+ id);
-                    finalizeOverlay(storageTbl['id'+id], element, stats);
-                } else {
-                    console.log('KittyExtension: Requesting - '+ id);
-                    requestId(element, stats);
-                }
-            }
-        }
-    }
-    $( "body").on( "mouseover", "a", overlay);
+  function isValidId(id) {
+    return !isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity");
+  }
 
-    //Updates attributes on specific kitty page
-    setInterval(function() {
-        var curPage = document.getElementsByClassName("KittyHeader-details");
-        if (curPage.length > 0 && curPage[0].innerHTML.substr(0, curPage[0].innerHTML.indexOf('</span>')) != curCat) {
-            curCat = curPage[0].innerHTML.substr(0, curPage[0].innerHTML.indexOf('</span>'));
-            if (document.getElementsByClassName("ListAttributes-item").length > 0) {
-                var cattributes = document.getElementsByClassName("ListAttributes-item");
+  //Creates overlay on hover
+  function overlay() {
+      var nativeElement = $( this )[0];
+      var id = /[^/]*$/.exec(nativeElement)[0];
+      if (isValidId(id)) {
+          curId = id;
+          foundId.push(id);
+          var mainSite = window.location.hostname == 'www.cryptokitties.co';
+          //console.log(nativeElement);
+          var element = mainSite ? nativeElement.children[0].children[0] : nativeElement;
+          if (element) {
+              var stats = {"id": curId, "fast":false, "gen": false, "cd": false};
+              if (element.children[1].children[0]) {
+                  stats.cd = element.children[1].children[0].innerHTML.includes("Resting");
+              }
+              if (mainSite) {
+                  if (nativeElement.children[0].children[1].children[2].innerText) {
+                  var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
+                  stats.fast = cdTbl.indexOf(nativeElement.children[0].children[1].children[2].innerText);
+                  }
+                  stats.gen = nativeElement.children[0].children[1].children[1].innerText.split('Gen ').pop();
+              }
+              element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
+              if ('id'+id in storageMyTbl) {
+                  console.log('KittyExtension: Retrieved - '+ id);
+                  finalizeOverlay(storageMyTbl['id'+id], element, stats);
+              } else if ('id'+id in storageTbl) {
+                  console.log('KittyExtension: Retrieved - '+ id);
+                  finalizeOverlay(storageTbl['id'+id], element, stats);
+              } else {
+                  console.log('KittyExtension: Requesting - '+ id);
+                  requestId(element, stats);
+              }
+          }
+      }
+  }
+  $( "body").on( "mouseover", "a", overlay);
 
-                for (var att in cattributes) {
-                    if (cattributes[att].style) {
-                        var catt = cattributes[att].innerText;
-                        var arr = getColor(catt);
-                        var color = arr[0];
-                        var num = arr[1];
-                        cattributes[att].style.backgroundColor = color;
-                        cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
-                        cattributes[att].innerHTML += num;
-                    }
-                }
-            }
-        }
-    }, 2000);
+  //Updates attributes on specific kitty page
+  setInterval(function() {
+      var curPage = document.getElementsByClassName("KittyHeader-details");
+      if (curPage.length > 0 && curPage[0].innerHTML.substr(0, curPage[0].innerHTML.indexOf('</span>')) != curCat) {
+          curCat = curPage[0].innerHTML.substr(0, curPage[0].innerHTML.indexOf('</span>'));
+          if (document.getElementsByClassName("ListAttributes-item").length > 0) {
+              var cattributes = document.getElementsByClassName("ListAttributes-item");
 
-    function calcPrice(id, cattributes, stats, element) {
-        var base = "https://api.cryptokitties.co/auctions";
-        var query = "?type=sale&limit=15&sorting=cheap&orderBy=current_price&orderDirection=asc&sorting=cheap&status=open&search=";
-        var totalGen = ' gen:'+stats.gen;
-        if (stats.gen >= 10) {
-            totalGen += ' gen:'+(stats.gen-1)+' gen:';
-            totalGen += parseInt(stats.gen)+1;
-        }
-        var rareTbl = getBestRares(cattributes);
-        var search = totalGen + rareTbl[0];
+              for (var att in cattributes) {
+                  if (cattributes[att].style) {
+                      var catt = cattributes[att].innerText;
+                      var arr = getColor(catt);
+                      var color = arr[0];
+                      var num = arr[1];
+                      cattributes[att].style.backgroundColor = color;
+                      cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
+                      cattributes[att].innerHTML += num;
+                  }
+              }
+          }
+      }
+  }, 2000);
 
-        function finishPrice(data, index) {
-            var newMultiplier = stats.id == data.auctions[index].kitty.id ? 1 : rareTbl[1];
-            var nomralizePrice = data.auctions[index].current_price/1000000000000000000;
-            return (nomralizePrice*newMultiplier).toFixed(2);
-        }
-        $.getJSON( base+query+search, function( data ) {
-            if (data.total > 0) {
-                if (data.total == 1) {
-                    if (data.auctions[0].kitty.id == id) {
-                        renderPrice(element, 'Name your price', query + search, false);
-                    } else {
-                        renderPrice(element, finishPrice(data, 0), query + search, true);
-                    }
-                } else {
-                    var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
-                    var cdValueTbl = ["Fast","Swift","Swift","Snappy","Snappy","Brisk","Brisk","Plodding","Plodding","Slow","Slow","Sluggish","Sluggish","Catatonic"];
-                    for (var x in data.auctions) {
-                        var cdValue = cdTbl.indexOf(cdValueTbl[data.auctions[x].kitty.status.cooldown_index]);
-                        if (stats.cd && stats.fast > 1) {
-                            renderPrice(element, finishPrice(data, x), query + search, false);
-                            return;
-                        } else if (stats.fast > 4 ||  stats.fast >= cdValue) {
-                            renderPrice(element, finishPrice(data, x), query + search, false);
-                            return;
-                        } else if (stats.cd && data.auctions[x].kitty.status.is_ready) {
-                            renderPrice(element, finishPrice(data, x), query + search, false);
-                            return;
-                        } if (x == data.auctions.length - 1) {
-                            renderPrice(element, finishPrice(data, x), query + search, true);
-                            return;
-                        }
-                    }
+  function calcPrice(id, cattributes, stats, element) {
+      var base = "https://api.cryptokitties.co/auctions";
+      var query = "?type=sale&limit=15&sorting=cheap&orderBy=current_price&orderDirection=asc&sorting=cheap&status=open&search=";
+      var totalGen = ' gen:'+stats.gen;
+      if (stats.gen >= 10) {
+          totalGen += ' gen:'+(stats.gen-1)+' gen:';
+          totalGen += parseInt(stats.gen)+1;
+      }
+      var rareTbl = getBestRares(cattributes);
+      var search = totalGen + rareTbl[0];
+
+      function finishPrice(data, index) {
+          var newMultiplier = stats.id == data.auctions[index].kitty.id ? 1 : rareTbl[1];
+          var nomralizePrice = data.auctions[index].current_price/1000000000000000000;
+          return (nomralizePrice*newMultiplier).toFixed(2);
+      }
+      $.getJSON( base+query+search, function( data ) {
+          if (data.total > 0) {
+              if (data.total == 1) {
+                  if (data.auctions[0].kitty.id == id) {
+                      renderPrice(element, 'Name your price', query + search, false);
+                  } else {
+                      renderPrice(element, finishPrice(data, 0), query + search, true);
+                  }
+              } else {
+                  var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
+                  var cdValueTbl = ["Fast","Swift","Swift","Snappy","Snappy","Brisk","Brisk","Plodding","Plodding","Slow","Slow","Sluggish","Sluggish","Catatonic"];
+                  for (var x in data.auctions) {
+                      var cdValue = cdTbl.indexOf(cdValueTbl[data.auctions[x].kitty.status.cooldown_index]);
+                      if (stats.cd && stats.fast > 1) {
+                          renderPrice(element, finishPrice(data, x), query + search, false);
+                          return;
+                      } else if (stats.fast > 4 ||  stats.fast >= cdValue) {
+                          renderPrice(element, finishPrice(data, x), query + search, false);
+                          return;
+                      } else if (stats.cd && data.auctions[x].kitty.status.is_ready) {
+                          renderPrice(element, finishPrice(data, x), query + search, false);
+                          return;
+                      } if (x == data.auctions.length - 1) {
+                          renderPrice(element, finishPrice(data, x), query + search, true);
+                          return;
+                      }
+                  }
 
 
-                }
-            } else {
-                renderPrice(element, 'Name your price', query + search, false);
-            }
-        }).fail(function() {
+              }
+          } else {
+              renderPrice(element, 'Name your price', query + search, false);
+          }
+      }).fail(function() {
 
-        });
-    }
+      });
+  }
 
-    function renderPrice(element, price, url, fast) {
-        if (price >= 50) {
-            price = Math.ceil(price / 10) * 10;
-            price += '+';
-        } else if (fast) {
-            price += '+';
-        }
-        var ul = element.getElementsByClassName("extWrapper")[0];
-        ul.innerHTML += "<ul class='extAttUl' onclick='searchSimilarKitties(event, &quot;"+ url +"&quot;)'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>value:</span> " + price + "</li></ul>";
-    }
+  function renderPrice(element, price, url, fast) {
+      if (price >= 50) {
+          price = Math.ceil(price / 10) * 10;
+          price += '+';
+      } else if (fast) {
+          price += '+';
+      }
+      var ul = element.getElementsByClassName("extWrapper")[0];
+      ul.innerHTML += "<ul class='extAttUl' onclick='searchSimilarKitties(event, &quot;"+ url +"&quot;)'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>value:</span> " + price + "</li></ul>";
+  }
 
-    function getBestRares(cattributes, adjust) {
-        var newCatts = [];
-        for (var single in cattributes) {
-            newCatts.push(cattributes[single].description);
-        }
-        cattributes = newCatts;
-        var best = '';
-        var hasRare = false;
-        var count = adjust || 0;
+  function getBestRares(cattributes, adjust) {
+      var newCatts = [];
+      for (var single in cattributes) {
+          newCatts.push(cattributes[single].description);
+      }
+      cattributes = newCatts;
+      var best = '';
+      var hasRare = false;
+      var count = adjust || 0;
 
-        if (cattributes.length === 0) {
-            hasRare = ' type:fancy';
-        }
-        for (var x in cattributes) {
-            if (!tbl[cattributes[x]]) {
-                best += ' ' + x;
-                count += 3;
-                hasRare = ' ' + x;
-            }
-        }
-        var multiplier = 1;
-        var multCount = 0;
-        for (var key1 in tbl) {
-            if (cattributes[key1]){
-                if (tbl[key1].count <= 0.4) {
-                    multCount += 6;
-                    if (multCount > 3) {
-                        multiplier *= 1.25;
-                    }
-                } else if(tbl[key1].count <= 1.8) {
-                    multCount += 3;
-                    if (multCount > 3) {
-                        multiplier *= 1.15;
-                    }
-                } else if (tbl[key1].count <= 5) {
-                    multCount += 2;
-                    if (multCount >= 6) {
-                        multiplier *= 1.05;
-                    }
-                } else if (tbl[key1].count <= 10) {
-                    multCount += 1;
-                    if (multCount >= 6) {
-                        multiplier *= 1.025;
-                    }
-                }
-            }
-        }
-        for (var key in tbl) {
-            if (cattributes.includes(key)) {
-                best += ' ' + key;
-                if (tbl[key].count <= 1.2) {
-                    count += 3;
-                    hasRare = ' '+key;
-                } else if (tbl[key].count <= 5) {
-                    count += 2;
-                } else if (tbl[key].count <= 10.5) {
-                    count += 1;
-                }
-            }
-            if (count >= 3) {
-                return [' ' + best, multiplier];
-            }
-        }
-        return [hasRare ? hasRare : '', multiplier];
-    }
+      if (cattributes.length === 0) {
+          hasRare = ' type:fancy';
+      }
+      for (var x in cattributes) {
+          if (!tbl[cattributes[x]]) {
+              best += ' ' + x;
+              count += 3;
+              hasRare = ' ' + x;
+          }
+      }
+      var multiplier = 1;
+      var multCount = 0;
+      for (var key1 in tbl) {
+          if (cattributes[key1]){
+              if (tbl[key1].count <= 0.4) {
+                  multCount += 6;
+                  if (multCount > 3) {
+                      multiplier *= 1.25;
+                  }
+              } else if(tbl[key1].count <= 1.8) {
+                  multCount += 3;
+                  if (multCount > 3) {
+                      multiplier *= 1.15;
+                  }
+              } else if (tbl[key1].count <= 5) {
+                  multCount += 2;
+                  if (multCount >= 6) {
+                      multiplier *= 1.05;
+                  }
+              } else if (tbl[key1].count <= 10) {
+                  multCount += 1;
+                  if (multCount >= 6) {
+                      multiplier *= 1.025;
+                  }
+              }
+          }
+      }
+      for (var key in tbl) {
+          if (cattributes.includes(key)) {
+              best += ' ' + key;
+              if (tbl[key].count <= 1.2) {
+                  count += 3;
+                  hasRare = ' '+key;
+              } else if (tbl[key].count <= 5) {
+                  count += 2;
+              } else if (tbl[key].count <= 10.5) {
+                  count += 1;
+              }
+          }
+          if (count >= 3) {
+              return [' ' + best, multiplier];
+          }
+      }
+      return [hasRare ? hasRare : '', multiplier];
+  }
 });
