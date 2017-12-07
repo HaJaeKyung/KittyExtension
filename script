@@ -126,8 +126,8 @@ $(document).ready(function() {
     }
 
     //Creates overlay on hover
-    function overlay() {
-        var nativeElement = $( this )[0];
+    function overlay(nativeElement) {
+        //var nativeElement = $( this )[0];
         var id = /[^/]*$/.exec(nativeElement)[0];
         if (isValidId(id)) {
             curId = id;
@@ -160,7 +160,7 @@ $(document).ready(function() {
             }
         }
     }
-    $( "body").on( "mouseover", "a", overlay);
+    //$( "body").on( "mouseover", "a", overlay);
 
     //Updates attributes on specific kitty page
     setInterval(function() {
@@ -315,4 +315,21 @@ $(document).ready(function() {
         }
         return [hasRare ? hasRare : '', multiplier];
     }
+
+    //Auto load the overlays
+    $( document ).ready(function() {
+
+        let update = function(){
+            if(document.getElementsByClassName('.extWrapper').length == 0){
+                var kitties = document.getElementsByClassName('KittiesGrid-item');
+                for(var i=0; i<kitties.length; i++){
+                    overlay(kitties[i].childNodes[0]);
+                }
+            }
+            setTimeout(update, 1500);
+        };
+
+        //Give the page some time to load
+        setTimeout(update, 1500);
+    });
 });
