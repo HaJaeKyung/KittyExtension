@@ -17,7 +17,7 @@ document.searchSimilarKitties = function(e, query) {
 $(document).ready(function() {
     console.log('CryptoKitties Extension Loaded');
     $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
-    $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; background-color: #a7ffeb; } </style>");
+    $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.4rem; font-size: 1.4rem; border: solid 1px black; background-color: #a7ffeb; } </style>");
     $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
     $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
@@ -100,7 +100,7 @@ $(document).ready(function() {
         }).fail(function() {
             var ul = element.getElementsByClassName("extAttUl")[0];
             ul.classList.remove("extBounce");
-            ul.innerHTML = "😿";
+            ul.innerHTML = "??";
         });
     }
 
@@ -146,7 +146,7 @@ $(document).ready(function() {
                     }
                     stats.gen = nativeElement.children[0].children[1].children[0].innerText.split('Gen ').pop();
                 }
-                element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
+                element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>??</ul></div>";
                 if ('id'+id in storageMyTbl) {
                     console.log('KittyExtension: Retrieved - '+ id);
                     finalizeOverlay(storageMyTbl['id'+id], element, stats);
