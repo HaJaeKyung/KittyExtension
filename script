@@ -144,7 +144,12 @@ $(document).ready(function() {
                         var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
                         stats.fast = cdTbl.indexOf(nativeElement.children[0].children[1].children[1].innerText);
                     }
-                    stats.gen = nativeElement.children[0].children[1].children[0].innerText.split('Gen ').pop();
+                    if(window.location.pathname == "/my-kitties" || window.location.pathname.startsWith("/profile")) {
+                        stats.gen = nativeElement.children[0].children[1].children[1].innerText.split('Gen ').pop();
+                    }
+                    else {
+                        stats.gen = nativeElement.children[0].children[1].children[0].innerText.split('Gen ').pop();
+                    }
                 }
                 element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
                 if ('id'+id in storageMyTbl) {
