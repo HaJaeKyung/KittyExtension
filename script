@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.27
+// @version      0.28
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -14,7 +14,7 @@ document.searchSimilarKitties = function(e, query) {
     e.preventDefault();
     window.location.href = "https://www.cryptokitties.co/marketplace/sale" + query;
 };
-$(function() {
+$(document).ready(function() {
     console.log('CryptoKitties Extension Loaded');
     $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
     $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-width: 2px; border-radius: 20px; background-color: #a7ffeb; } </style>");
@@ -22,7 +22,7 @@ $(function() {
     $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
 
-    var version = "0.27";
+    var version = "0.28";
     var found = false;
     var foundId = [];
     var curCat = 'n/a';
@@ -133,19 +133,18 @@ $(function() {
             curId = id;
             foundId.push(id);
             var mainSite = window.location.hostname == 'www.cryptokitties.co';
-            //console.log(nativeElement);
             var element = mainSite ? nativeElement.children[0].children[0] : nativeElement;
             if (element) {
                 var stats = {"id": curId, "fast":false, "gen": false, "cd": false};
-                if (element.children[1].children[0]) {
-                    stats.cd = element.children[1].children[0].innerHTML.includes("Resting");
-                }
                 if (mainSite) {
-                    if (nativeElement.children[0].children[1].children[2].innerText) {
-                    var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
-                    stats.fast = cdTbl.indexOf(nativeElement.children[0].children[1].children[2].innerText);
+                    if (element.children[1].children[0]) {
+                        stats.cd = nativeElement.innerHTML.includes("Resting");
                     }
-                    stats.gen = nativeElement.children[0].children[1].children[1].innerText.split('Gen ').pop();
+                    if (nativeElement.children[0].children[1].children[1].innerText) {
+                        var cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
+                        stats.fast = cdTbl.indexOf(nativeElement.children[0].children[1].children[1].innerText);
+                    }
+                    stats.gen = nativeElement.children[0].children[1].children[0].innerText.split('Gen ').pop();
                 }
                 element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
                 if ('id'+id in storageMyTbl) {
