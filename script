@@ -348,6 +348,11 @@ $(document).ready(() => {
         if (ethPrice && items.length > 0 && document.getElementsByClassName('extUSD').length > 0) {
             for (let item of items) {
                 if (item.parentElement.parentElement.className == "KittyStatus" || item.parentElement.parentElement.className == "KittyStatus KittyStatus--list") {
+                    let text = item.getElementsByTagName('span')[0].innerText;
+                    if(text.toUpperCase().indexOf("HOURS")>0){
+                        return;
+                    }
+
                     let cur = item.getElementsByTagName('span')[0].innerText.split(' ');
                     if (currency == "💲👍" && cur[0] != "$") {
                         item.getElementsByTagName('span')[0].innerText = '$ ' + (cur[1] * ethPrice ).toFixed(2);
