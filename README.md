@@ -7,7 +7,7 @@ Gives color coded rarity info by hovering and more
 • Create a new Tampermonkey script inside the Dashboard, remove the existing code and then paste the [script code](https://raw.githubusercontent.com/HaJaeKyung/CryptoCatAdd/master/script) inside. After that you just need to save it and reload the kitty site.
 
 #### Color rarity:
-Pink: ultra rare
+Pink: ultra rare  
 Orange: very rare  
 Purple: rare  
 Blue: uncommon  
