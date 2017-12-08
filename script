@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.29
+// @version      0.29a
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -345,14 +345,20 @@ $(document).ready(() => {
 
     function changePrices() {
         let items = document.getElementsByClassName('KittyStatus-itemText');
+
         if (ethPrice && items.length > 0 && document.getElementsByClassName('extUSD').length > 0) {
             for (let item of items) {
                 if (item.parentElement.parentElement.className == "KittyStatus" || item.parentElement.parentElement.className == "KittyStatus KittyStatus--list") {
-                    let cur = item.getElementsByTagName('span')[0].innerText.split(' ');
+                    let text = item.getElementsByTagName('span')[0].innerText;
+                    if(text.indexOf("Burn") > 0 || text.indexOf("Resting")){
+                        return;
+                    }
+
+                    let cur = text.split(' ');
                     if (currency == "💲👍" && cur[0] != "$") {
-                        item.getElementsByTagName('span')[0].innerText = '$ ' + (cur[1] * ethPrice ).toFixed(2);
+                        text = '$ ' + (cur[1] * ethPrice ).toFixed(2);
                     } else if (currency == "💲👎" && cur[0] != "Ξ") {
-                        item.getElementsByTagName('span')[0].innerText = 'Ξ ' + (cur[1] / ethPrice ).toFixed(2);
+                       text = 'Ξ ' + (cur[1] / ethPrice ).toFixed(2);
                     }
                 }
             }
