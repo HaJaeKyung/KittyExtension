@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.30
+// @version      0.31
 // @updateUrl    https://raw.githubusercontent.com/HaJaeKyung/KittyExtension/master/script
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
@@ -35,7 +35,8 @@ $(document).ready(() => {
     $("head").append("<style> .extUSD:focus {  outline:0; } .extUSD:active {  box-shadow: 0 1px rgba(143, 141, 118, 0.6); transform: translateY(2px);} .extUSD:hover {background-color:#dff7f1;}</style>");
     $("head").append("<style> .extCD {  font-size: 1.1rem; font-weight: 100; } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
-    const version = "0.30";
+
+    const version = "0.31";
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
@@ -52,7 +53,7 @@ $(document).ready(() => {
             }
         });
     }, true);
-    let tbl = {"oldlace":{"count":0.0132},"wolfgrey":{"count":0.0318},"gerbil":{"count":0.0598},"cottoncandy":{"count":0.1172},"violet":{"count":0.2375},"wingtips":{"count":0.3206},"mainecoon":{"count":0.5433},"jaguar":{"count":0.9493},"cerulian":{"count":1.172},"googly":{"count":1.4902},"chartreux":{"count":1.5811},"whixtensions":{"count":1.765},"fabulous":{"count":1.7999},"peach":{"count":3.5929},"bubblegum":{"count":4.0927},"dali":{"count":4.2255},"otaku":{"count":4.8262},"gold":{"count":5.673},"skyblue":{"count":5.7902},"bloodred":{"count":6.0852},"scarlet":{"count":6.2031},"tigerpunk":{"count":6.5959},"limegreen":{"count":6.9118},"beard":{"count":7.9402},"cloudwhite":{"count":8.2344},"emeraldgreen":{"count":8.4323},"spock":{"count":8.8297},"laperm":{"count":9.0191},"calicool":{"count":9.0882},"barkbrown":{"count":9.2589},"chestnut":{"count":10.2509},"tongue":{"count":11.1077},"mauveover":{"count":11.2575},"cymric":{"count":13.3967},"shadowgrey":{"count":16.1016},"coffee":{"count":16.1691},"saycheese":{"count":16.9601},"salmon":{"count":17.3373},"royalpurple":{"count":17.7533},"mintgreen":{"count":18.8609},"swampgreen":{"count":19.2272},"chocolate":{"count":19.2614},"lemonade":{"count":19.6262},"sphynx":{"count":19.7954},"topaz":{"count":19.8101},"simple":{"count":20.0422},"orangesoda":{"count":20.2914},"aquamarine":{"count":20.6344},"greymatter":{"count":20.7555},"munchkin":{"count":21.0109},"raisedbrow":{"count":22.0331},"happygokitty":{"count":23.2082},"soserious":{"count":23.4822},"strawberry":{"count":24.0628},"ragamuffin":{"count":24.3391},"sizzurp":{"count":25.0431},"himalayan":{"count":25.0726},"pouty":{"count":25.9333},"crazy":{"count":31.7546},"thicccbrowz":{"count":32.4268},"luckystripe":{"count":34.5457},"kittencream":{"count":47.8182},"granitegrey":{"count":48.7705},"totesbasic":{"count":54.6811}};
+    let tbl = {"oldlace":{"count":0.017},"wolfgrey":{"count":0.0421},"gerbil":{"count":0.0754},"cottoncandy":{"count":0.13},"violet":{"count":0.2525},"wingtips":{"count":0.267},"mainecoon":{"count":0.4731},"jaguar":{"count":0.8789},"cerulian":{"count":1.0146},"chartreux":{"count":1.3721},"googly":{"count":1.4286},"fabulous":{"count":1.509},"whixtensions":{"count":1.651},"peach":{"count":3.1255},"bubblegum":{"count":3.4188},"dali":{"count":3.5325},"otaku":{"count":4.0565},"skyblue":{"count":4.8908},"gold":{"count":5.0987},"bloodred":{"count":5.2143},"scarlet":{"count":5.306},"tigerpunk":{"count":5.4725},"limegreen":{"count":5.8042},"beard":{"count":6.6335},"cloudwhite":{"count":6.9049},"emeraldgreen":{"count":7.1863},"laperm":{"count":7.5752},"spock":{"count":7.5966},"calicool":{"count":7.6506},"barkbrown":{"count":7.7587},"chestnut":{"count":8.5854},"tongue":{"count":9.2476},"mauveover":{"count":9.6534},"cymric":{"count":11.437},"shadowgrey":{"count":13.4737},"coffee":{"count":13.5572},"saycheese":{"count":14.4958},"salmon":{"count":14.6102},"royalpurple":{"count":14.9337},"mintgreen":{"count":15.7441},"swampgreen":{"count":16.1462},"chocolate":{"count":16.1606},"lemonade":{"count":16.4333},"sphynx":{"count":16.5715},"topaz":{"count":16.6437},"simple":{"count":16.765},"orangesoda":{"count":17.0533},"aquamarine":{"count":17.304},"greymatter":{"count":17.3587},"munchkin":{"count":17.6967},"raisedbrow":{"count":18.5435},"happygokitty":{"count":19.4054},"soserious":{"count":19.6398},"strawberry":{"count":20.2291},"ragamuffin":{"count":20.3453},"sizzurp":{"count":20.9509},"himalayan":{"count":21.047},"pouty":{"count":21.7745},"crazy":{"count":26.5899},"thicccbrowz":{"count":27.3055},"luckystripe":{"count":28.8785},"kittencream":{"count":40.046},"granitegrey":{"count":40.8979},"totesbasic":{"count":45.9847}};
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
             storageMyTbl['id'+id] = cattributes;
@@ -96,7 +97,7 @@ $(document).ready(() => {
                 color = "#ff0dbf"; // legendary
             } else if (tbl[catt].count <= 1.8) {
                 color = "#ff8000"; // legendary
-            } else if (tbl[catt].count < 7) {
+            } else if (tbl[catt].count < 8) {
                 color = "#a335ee"; // epic
             } else if (tbl[catt].count <= 16) {
                 color = "#0070ff"; // rare
@@ -108,7 +109,7 @@ $(document).ready(() => {
             count = tbl[catt].count < 1 ? tbl[catt].count.toFixed(3) : tbl[catt].count.toFixed(1);
             count = tbl[catt].count <= 20 ? " ("+ count +"%)" : " (20%+)";
         } else {
-            color = "#ff0dbf";
+            color = "rgba(255,255,255, 0.98)";
             count = " (Ultra%)";
         }
         return [color, count];
