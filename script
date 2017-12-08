@@ -36,6 +36,73 @@ $(document).ready(() => {
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
 
     const version = "0.31";
+    const orderedCattributes = [
+          "whixtensions",
+          "gerbil",
+          "dali",
+          "tongue",
+          "beard",
+          "pouty",
+          "saycheese",
+          "happygokitty",
+          "soserious",
+          "peach",
+          "bloodred",
+          "granitegrey",
+          "kittencream",
+          "emeraldgreen",
+          "wolfgrey",
+          "cerulian",
+          "skyblue",
+          "royalpurple",
+          "swampgreen",
+          "violet",
+          "scarlet",
+          "barkbrown",
+          "coffee",
+          "lemonade",
+          "chocolate",
+          "cloudwhite",
+          "shadowgrey",
+          "salmon",
+          "oldlace",
+          "orangesoda",
+          "mauveover",
+          "aquamarine",
+          "greymatter",
+          "fabulous",
+          "googly",
+          "raisedbrow",
+          "otaku",
+          "simple",
+          "crazy",
+          "thiccbrowz",
+          "wingtips",
+          "gold",
+          "limegreen",
+          "topaz",
+          "bubblegum",
+          "mintgreen",
+          "sizzurp",
+          "chestnut",
+          "strawberry",
+          "tigerpunk",
+          "totesbasic",
+          "calicool",
+          "luckystripe",
+          "jaguar",
+          "spock",
+          "totesbasic",
+          "totesbasic",
+          "mainecoon",
+          "laperm",
+          "cymric",
+          "chartreux",
+          "himalayan",
+          "munchkin",
+          "sphynx",
+          "ragamuffin"
+    ];
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
@@ -116,6 +183,8 @@ $(document).ready(() => {
 
     function requestId(element, stats) {
         $.getJSON( "https://api.cryptokitties.co/kitties/"+stats.id, data => {
+            // sort cattributes so they are grouped for easier comparison visually
+            data.cattributes.sort((a, b) => orderedCattributes.indexOf(a.description) - orderedCattributes.indexOf(b.description));
             finalizeOverlay(data.cattributes, element, stats);
             if (hasLocalStorage) {
                 if (data.children.length === 0) {
