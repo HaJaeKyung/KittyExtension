@@ -50,6 +50,56 @@ $(document).ready(() => {
     }, true);
     let tbl = {"oldlace":{"count":0.0016},"wolfgrey":{"count":0.0047},"gerbil":{"count":0.0147},"cottoncandy":{"count":0.0171},"violet":{"count":0.0683},"wingtips":{"count":0.2701},"mainecoon":{"count":0.3974},"jaguar":{"count":0.6015},"googly":{"count":0.6745},"whixtensions":{"count":0.9136},"cerulian":{"count":0.9213},"chartreux":{"count":1.1728},"fabulous":{"count":1.5252},"peach":{"count":2.6692},"bubblegum":{"count":3.5098},"gold":{"count":3.5812},"dali":{"count":3.7225},"otaku":{"count":4.0896},"scarlet":{"count":4.8262},"bloodred":{"count":4.8906},"skyblue":{"count":4.9178},"tigerpunk":{"count":5.8166},"limegreen":{"count":5.9649},"emeraldgreen":{"count":6.6518},"spock":{"count":6.8373},"beard":{"count":6.8683},"cloudwhite":{"count":7.1586},"laperm":{"count":7.7384},"calicool":{"count":7.7966},"barkbrown":{"count":7.889},"chestnut":{"count":8.8281},"mauveover":{"count":8.8398},"tongue":{"count":9.796},"cymric":{"count":10.5334},"saycheese":{"count":13.3749},"shadowgrey":{"count":13.6831},"coffee":{"count":13.7304},"salmon":{"count":14.6269},"royalpurple":{"count":15.0095},"mintgreen":{"count":16.1404},"chocolate":{"count":16.2879},"swampgreen":{"count":16.4781},"lemonade":{"count":16.7466},"topaz":{"count":16.8592},"sphynx":{"count":16.9996},"simple":{"count":17.0485},"orangesoda":{"count":17.1851},"aquamarine":{"count":17.5119},"munchkin":{"count":17.6811},"greymatter":{"count":17.8674},"raisedbrow":{"count":18.6707},"happygokitty":{"count":19.8319},"soserious":{"count":20.2976},"strawberry":{"count":20.4489},"ragamuffin":{"count":20.7959},"sizzurp":{"count":21.5247},"himalayan":{"count":21.586},"pouty":{"count":22.0176},"crazy":{"count":27.1147},"thicccbrowz":{"count":27.4523},"luckystripe":{"count":29.8856},"kittencream":{"count":41.0826},"granitegrey":{"count":41.5568},"totesbasic":{"count":45.9065}};
 
+    function fetchCattributeFrequency() {
+        if (hasLocalStorage) {
+            var lastFetchTime = localStorage.getItem("lastFetchTime") || 0;
+            var lastFetchTbl = JSON.parse(localStorage.getItem("cattributeFrequency")) || 0;
+            var now = new Date().getTime();
+            // Fetch cattribute frequency if last fetch was over 12 hours ago, or we have not fetched before
+            if (Math.floor((now - lastFetchTime) / 3600000) > 12 || !lastFetchTbl) {
+                // Get around “No Access-Control-Allow-Origin header” problems https://stackoverflow.com/questions/43871637
+                const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+                const cattributesUrl = "https://cryptokittydex.com/cattributes";
+                fetch(proxyUrl + cattributesUrl, {
+                    method: "get"
+                }).then(response => response.text()
+                ).then(function(contents) {
+                    var cattributesList = $.parseHTML(contents)[22].children[0].children[0].children[1];
+                    var cattributeFrequency = {};
+                    for (var i = 0; i < cattributesList.children.length; i++) {
+                        var cattributeName = cattributesList.children[i].children[1].children[0].textContent;
+                        var cattributeAmount = parseFloat(cattributesList.children[i].children[0].style.width.replace(/[^0-9\.]/g, ''), 10);
+                        cattributeFrequency[cattributeName] = { "count": Math.round(cattributeAmount * 100.0) / 100.0 };
+                    }
+                    tbl = cattributeFrequency;
+                    console.log(tbl);
+                    if (document.getElementsByClassName("ListAttributes-item").length > 0) {
+                        var cattributes = document.getElementsByClassName("ListAttributes-item");
+                        for (var att in cattributes) {
+                            if (cattributes[att].style) {
+                                // This is reading the cattributes after the percentages are already written using the harded coded tbl
+                                // So we split at the string and extract the first part
+                                var catt = cattributes[att].innerText.split(" ")[0];
+                                var arr = getColor(catt);
+                                var color = arr[0];
+                                var num = arr[1];
+                                // Update the cattribute colors and replace the older percentage with the new one
+                                cattributes[att].style.backgroundColor = color;
+                                cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
+                                cattributes[att].innerText = cattributes[att].innerText.replace(/\((.+?)\)/g, num);
+                            }
+                        }
+                    }
+                    localStorage.setItem('lastFetchTime', now);
+                    localStorage.setItem('cattributeFrequency', JSON.stringify(cattributeFrequency));
+                    console.log("Fetched new cattribute frequency");
+                });
+            } else {
+                tbl = lastFetchTbl;
+                console.log("Loaded cached cattribute frequency");
+            }
+        }
+    }
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
             storageMyTbl['id'+id] = cattributes;
@@ -77,6 +127,7 @@ $(document).ready(() => {
 
     let hasLocalStorage = typeof(Storage) !== "undefined";
     checkVersion();
+    fetchCattributeFrequency();
     let storageTbl = JSON.parse(localStorage.getItem('kittyExtensionTbl')) || {};
     let storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
     let currency = localStorage.getItem('kittyExtensionEtherUSD') || "💲👎";
@@ -136,14 +187,14 @@ $(document).ready(() => {
             }
         }
 
-        if (window.location.hostname == 'www.cryptokitties.co') {
-            calcPrice(stats.id , cattributes, stats, element);
-        }
-    }
+      if (window.location.hostname == 'www.cryptokitties.co') {
+          calcPrice(stats.id , cattributes, stats, element);
+      }
+  }
 
-    function isValidId(id) {
-      return !isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity");
-    }
+  function isValidId(id) {
+    return !isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity");
+  }
 
     //Creates overlay on hover
     function overlay() {
@@ -260,8 +311,8 @@ $(document).ready(() => {
             }
         }).fail(() => {
 
-        });
-    }
+      });
+  }
 
     function renderPrice(element, price, url, fast) {
         if (price >= 50) {
