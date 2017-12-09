@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.29
+// @version      0.31
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -27,18 +27,22 @@ eval(c.code);
 $(document).ready(() => {
     console.log('CryptoKitties Extension Loaded');
     $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
-    $("head").append("<style> .extAtt { padding-left: 2px; padding-right: 2px; color: rgb(42, 40, 37); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-color: rgba(66, 66, 66, 0.35); border-width: 1.5px; border-radius: 20px; background-color: #a7ffeb; } </style>");
+    $("head").append("<style> .extAtt { min-width: 75px; padding-left: 2px; padding-right: 2px; color: rgba(255,255,255, 0.99); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-color: rgba(66, 66, 66, 0.35); border-width: 1.5px; border-radius: 20px; background-color: #00bcd4; } </style>");
     $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
     $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
-    $("head").append("<style> .extUSD {  position:absolute; top:0; left:0; } </style>");
+    $("head").append("<style> .extUSD {  z-index: 100; position:absolute; top:0; left:0; box-shadow: 0 3px rgba(143, 141, 138, 0.6); border-width: 0.5px; background-color: #dff7f1; } </style>");
+    $("head").append("<style> .extUSD:focus {  outline:0; } .extUSD:active {  box-shadow: 0 1px rgba(143, 141, 118, 0.6); transform: translateY(2px);} .extUSD:hover {background-color:#dff7f1;}</style>");
+    $("head").append("<style> .extCD {  font-size: 1.1rem; font-weight: 100; } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
-    const version = "0.29";
+
+    const version = "0.31";
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
     let hasChanged = false;
     let ethPrice = false;
     let url = location.href;
+    let restrictAPI = 0;
     document.body.addEventListener('click', () => {
         requestAnimationFrame(()=> {
             if (url!==location.href) {
@@ -48,8 +52,7 @@ $(document).ready(() => {
             }
         });
     }, true);
-    let tbl = {"oldlace":{"count":0.0016},"wolfgrey":{"count":0.0047},"gerbil":{"count":0.0147},"cottoncandy":{"count":0.0171},"violet":{"count":0.0683},"wingtips":{"count":0.2701},"mainecoon":{"count":0.3974},"jaguar":{"count":0.6015},"googly":{"count":0.6745},"whixtensions":{"count":0.9136},"cerulian":{"count":0.9213},"chartreux":{"count":1.1728},"fabulous":{"count":1.5252},"peach":{"count":2.6692},"bubblegum":{"count":3.5098},"gold":{"count":3.5812},"dali":{"count":3.7225},"otaku":{"count":4.0896},"scarlet":{"count":4.8262},"bloodred":{"count":4.8906},"skyblue":{"count":4.9178},"tigerpunk":{"count":5.8166},"limegreen":{"count":5.9649},"emeraldgreen":{"count":6.6518},"spock":{"count":6.8373},"beard":{"count":6.8683},"cloudwhite":{"count":7.1586},"laperm":{"count":7.7384},"calicool":{"count":7.7966},"barkbrown":{"count":7.889},"chestnut":{"count":8.8281},"mauveover":{"count":8.8398},"tongue":{"count":9.796},"cymric":{"count":10.5334},"saycheese":{"count":13.3749},"shadowgrey":{"count":13.6831},"coffee":{"count":13.7304},"salmon":{"count":14.6269},"royalpurple":{"count":15.0095},"mintgreen":{"count":16.1404},"chocolate":{"count":16.2879},"swampgreen":{"count":16.4781},"lemonade":{"count":16.7466},"topaz":{"count":16.8592},"sphynx":{"count":16.9996},"simple":{"count":17.0485},"orangesoda":{"count":17.1851},"aquamarine":{"count":17.5119},"munchkin":{"count":17.6811},"greymatter":{"count":17.8674},"raisedbrow":{"count":18.6707},"happygokitty":{"count":19.8319},"soserious":{"count":20.2976},"strawberry":{"count":20.4489},"ragamuffin":{"count":20.7959},"sizzurp":{"count":21.5247},"himalayan":{"count":21.586},"pouty":{"count":22.0176},"crazy":{"count":27.1147},"thicccbrowz":{"count":27.4523},"luckystripe":{"count":29.8856},"kittencream":{"count":41.0826},"granitegrey":{"count":41.5568},"totesbasic":{"count":45.9065}};
-
+    let tbl = {"oldlace":{"count":0.017},"wolfgrey":{"count":0.0421},"gerbil":{"count":0.0754},"cottoncandy":{"count":0.13},"violet":{"count":0.2525},"wingtips":{"count":0.267},"mainecoon":{"count":0.4731},"jaguar":{"count":0.8789},"cerulian":{"count":1.0146},"chartreux":{"count":1.3721},"googly":{"count":1.4286},"fabulous":{"count":1.509},"whixtensions":{"count":1.651},"peach":{"count":3.1255},"bubblegum":{"count":3.4188},"dali":{"count":3.5325},"otaku":{"count":4.0565},"skyblue":{"count":4.8908},"gold":{"count":5.0987},"bloodred":{"count":5.2143},"scarlet":{"count":5.306},"tigerpunk":{"count":5.4725},"limegreen":{"count":5.8042},"beard":{"count":6.6335},"cloudwhite":{"count":6.9049},"emeraldgreen":{"count":7.1863},"laperm":{"count":7.5752},"spock":{"count":7.5966},"calicool":{"count":7.6506},"barkbrown":{"count":7.7587},"chestnut":{"count":8.5854},"tongue":{"count":9.2476},"mauveover":{"count":9.6534},"cymric":{"count":11.437},"shadowgrey":{"count":13.4737},"coffee":{"count":13.5572},"saycheese":{"count":14.4958},"salmon":{"count":14.6102},"royalpurple":{"count":14.9337},"mintgreen":{"count":15.7441},"swampgreen":{"count":16.1462},"chocolate":{"count":16.1606},"lemonade":{"count":16.4333},"sphynx":{"count":16.5715},"topaz":{"count":16.6437},"simple":{"count":16.765},"orangesoda":{"count":17.0533},"aquamarine":{"count":17.304},"greymatter":{"count":17.3587},"munchkin":{"count":17.6967},"raisedbrow":{"count":18.5435},"happygokitty":{"count":19.4054},"soserious":{"count":19.6398},"strawberry":{"count":20.2291},"ragamuffin":{"count":20.3453},"sizzurp":{"count":20.9509},"himalayan":{"count":21.047},"pouty":{"count":21.7745},"crazy":{"count":26.5899},"thicccbrowz":{"count":27.3055},"luckystripe":{"count":28.8785},"kittencream":{"count":40.046},"granitegrey":{"count":40.8979},"totesbasic":{"count":45.9847}};
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
             storageMyTbl['id'+id] = cattributes;
@@ -91,11 +94,11 @@ $(document).ready(() => {
         if (tbl[catt]) {
             if (tbl[catt].count <= 0.15) {
                 color = "#ff0dbf"; // legendary
-            } else if (tbl[catt].count <= 1.2) {
+            } else if (tbl[catt].count <= 1.8) {
                 color = "#ff8000"; // legendary
-            } else if (tbl[catt].count < 5) {
+            } else if (tbl[catt].count < 8) {
                 color = "#a335ee"; // epic
-            } else if (tbl[catt].count <= 12) {
+            } else if (tbl[catt].count <= 16) {
                 color = "#0070ff"; // rare
             } else if (tbl[catt].count <= 20) {
                 color = "white";   // common
@@ -105,7 +108,7 @@ $(document).ready(() => {
             count = tbl[catt].count < 1 ? tbl[catt].count.toFixed(3) : tbl[catt].count.toFixed(1);
             count = tbl[catt].count <= 20 ? " ("+ count +"%)" : " (20%+)";
         } else {
-            color = "#ff0dbf";
+            color = "rgba(255,255,255, 0.98)";
             count = " (Ultra%)";
         }
         return [color, count];
@@ -115,6 +118,17 @@ $(document).ready(() => {
         $.getJSON( "https://api.cryptokitties.co/kitties/"+stats.id, data => {
             finalizeOverlay(data.cattributes, element, stats);
             if (hasLocalStorage) {
+                if (data.children.length === 0) {
+                    let ul = element.getElementsByClassName("extWrapper")[0];
+                    ul.innerHTML += "<ul class='extAttUl'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>&nbsp;virgin&nbsp;</span></li></ul>";
+                }
+
+                if (!data.status.is_ready) {
+                    let note = element.getElementsByClassName('KittyStatus-note');
+                    let cd = (((data.status.cooldown - Date.now())/6000/600));
+                    let time = timeDisplay(cd * 3600);
+                    note[note[1] ? 1 : 0].textContent = time;
+                }
                 saveStorage(stats.id, data.cattributes);
             }
         }).fail(() => {
@@ -124,6 +138,30 @@ $(document).ready(() => {
         });
     }
 
+    function timeDisplay(seconds) {
+        if (typeof seconds === "number") {
+            seconds = Math.floor(seconds);
+            let hourS = seconds / 3600;
+            let minute = Math.floor(seconds / 60);
+            let second = seconds % 60;
+            second = second < 10 ? '0'+second : second;
+            if (hourS> 1) {
+                let hour = Math.floor(seconds / 3600);
+                minute = minute % 60;
+                minute = minute < 10 ? '0' + minute : minute;
+                if (hourS > 24) {
+                    return hour + ' hours';
+                } else {
+                    return hour + ':' + minute;
+                }
+            } else {
+                return minute + ' minutes';
+            }
+        } else {
+            return '';
+        }
+    }
+
     function finalizeOverlay(cattributes, element, stats) {
         let ul = element.getElementsByClassName("extAttUl")[0];
         ul.classList.remove("extBounce");
@@ -131,14 +169,14 @@ $(document).ready(() => {
         for (let x in cattributes) {
             if (cattributes[x]) {
                 let background_color = getColor(cattributes[x].description)[0];
-                let color = background_color == 'white' ? 'rgb(42, 40, 37)' : '#fff';
+                let color = background_color == 'white' ? 'rgba(0,0,0, 0.76)' : 'rgba(255,255,255, 0.98)';
                 ul.innerHTML += "<li class='extAtt' style=\'background-color:"+background_color+"; color: "+color+"\'>"+cattributes[x].description+"</li>";
             }
         }
 
-        if (window.location.hostname == 'www.cryptokitties.co') {
-            calcPrice(stats.id , cattributes, stats, element);
-        }
+        //if (window.location.hostname == 'www.cryptokitties.co') {
+            //calcPrice(stats.id , cattributes, stats, element);
+        //}
     }
 
     function isValidId(id) {
@@ -146,12 +184,11 @@ $(document).ready(() => {
     }
 
     //Creates overlay on hover
+    var timer = Date.now();
     function overlay() {
         let nativeElement = $( this )[0];
         let id = /[^/]*$/.exec(nativeElement)[0];
         if (isValidId(id)) {
-            console.log();
-            console.log();
             curId = id;
             foundId.push(id);
             let mainSite = window.location.hostname == 'www.cryptokitties.co';
@@ -171,16 +208,17 @@ $(document).ready(() => {
                     stats.gen = nativeElement.getElementsByClassName('KittyCard-subname')[0].innerText.split('Gen ').pop();
                 }
                 element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
-                if ('id'+id in storageMyTbl) {
-                    console.log('KittyExtension: Retrieved - '+ id);
-                    finalizeOverlay(storageMyTbl['id'+id], element, stats);
-                } else if ('id'+id in storageTbl) {
-                    console.log('KittyExtension: Retrieved - '+ id);
-                    finalizeOverlay(storageTbl['id'+id], element, stats);
-                } else {
+
+                setTimeout(()=> {
                     console.log('KittyExtension: Requesting - '+ id);
                     requestId(element, stats);
-                }
+                }, timer - Date.now());
+
+                restrictAPI += 1000;
+                setTimeout(()=> {
+                    restrictAPI -= 1000;
+                }, 1000);
+                timer = Date.now() + restrictAPI;
             }
         }
     }
@@ -271,7 +309,7 @@ $(document).ready(() => {
             price += '+';
         }
         let ul = element.getElementsByClassName("extWrapper")[0];
-        ul.innerHTML += "<ul class='extAttUl' onclick='searchSimilarKitties(event, &quot;"+ url +"&quot;)'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>value:</span> " + price + "</li></ul>";
+        ul.innerHTML += "<ul class='extAttUl' onclick='searchSimilarKitties(event, &quot;"+ url +"&quot;)'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>Score:</span> " + price + "</li></ul>";
     }
 
     function getBestRares(cattributes, adjust) {
@@ -294,48 +332,62 @@ $(document).ready(() => {
                 hasRare = ' ' + x;
             }
         }
+        let score = 0;
         let multiplier = 1;
         let multCount = 0;
         for (let key1 in tbl) {
-            if (cattributes[key1]){
-                if (tbl[key1].count <= 0.4) {
-                    multCount += 6;
-                    if (multCount > 3) {
+            if (tbl[key1].count) {
+                for (let key in cattributes) {
+                    if (tbl[key1].count <= 0.4) {
+                        multiplier *= 1.55;
+                    } else if(tbl[key1].count <= 1.8) {
                         multiplier *= 1.25;
-                    }
-                } else if(tbl[key1].count <= 1.8) {
-                    multCount += 3;
-                    if (multCount > 3) {
-                        multiplier *= 1.15;
-                    }
-                } else if (tbl[key1].count <= 5) {
-                    multCount += 2;
-                    if (multCount >= 6) {
+                    } else if (tbl[key1].count <= 5) {
                         multiplier *= 1.05;
-                    }
-                } else if (tbl[key1].count <= 10) {
-                    multCount += 1;
-                    if (multCount >= 6) {
+                    } else if (tbl[key1].count <= 10) {
                         multiplier *= 1.025;
                     }
                 }
             }
         }
+        console.log(multiplier);
         for (let key in tbl) {
             if (cattributes.includes(key)) {
-                best += ' ' + key;
                 if (tbl[key].count <= 1.2) {
-                    count += 3;
-                    hasRare = ' '+key;
                 } else if (tbl[key].count <= 6) {
-                    count += 3;
                 }
             }
             if (count >= 3) {
                 return [' ' + best, multiplier];
             }
         }
-        return [hasRare ? hasRare : '', multiplier];
+        let attrCount = 0;
+        cattributes.forEach((key)=>{
+            if (tbl[key]) {
+                if (tbl[key].count <= 0.4) {
+                    attrCount += 3;
+                } else if(tbl[key].count <= 1.8) {
+                    attrCount += 2;
+                } else if (tbl[key].count <= 5) {
+                    attrCount += 1;
+                } else if (tbl[key].count <= 10) {
+                    attrCount += 1;
+                } else {
+                    score += 0;
+                }
+            } else {
+                attrCount += 5;
+            }
+            score = ((attrCount/6)*7)+1;
+            console.log(score);
+            if (cattributes.length === 0) {
+                score = 8;
+            } else if (cattributes.length > 8) {
+                score -= cattributes.length - 8;
+            }
+        });
+            console.log('score',score);
+        return score;
     }
 
     document.searchSimilarKitties = (e, query) => {
@@ -348,16 +400,21 @@ $(document).ready(() => {
         if (ethPrice && items.length > 0 && document.getElementsByClassName('extUSD').length > 0) {
             for (let item of items) {
                 if (item.parentElement.parentElement.className == "KittyStatus" || item.parentElement.parentElement.className == "KittyStatus KittyStatus--list") {
-                    let text = item.getElementsByTagName('span')[0].innerText;
-                    if(text.toUpperCase().indexOf("HOURS")>0){
-                        return;
-                    }
+                    if (!item.parentElement.innerHTML.includes("Icon--timer") && !item.parentElement.innerHTML.includes('Bun in oven')) {
+                        let cur = item.getElementsByTagName('span')[0].innerText.split(' ');
 
-                    let cur = item.getElementsByTagName('span')[0].innerText.split(' ');
-                    if (currency == "💲👍" && cur[0] != "$") {
-                        item.getElementsByTagName('span')[0].innerText = '$ ' + (cur[1] * ethPrice ).toFixed(2);
-                    } else if (currency == "💲👎" && cur[0] != "Ξ") {
-                        item.getElementsByTagName('span')[0].innerText = 'Ξ ' + (cur[1] / ethPrice ).toFixed(2);
+                        if (currency == "💲👍" && cur[0] != "$") {
+                            let endPrice = (cur[1] * ethPrice ).toFixed(2);
+                            if (endPrice != 'NaN') {
+                                item.getElementsByTagName('span')[0].innerText = '$ ' + endPrice;
+                            }
+                        } else if (currency == "💲👎" && cur[0] != "Ξ") {
+                            let endPrice = (cur[1] / ethPrice ).toFixed(2);
+                            if (endPrice != 'NaN') {
+                                item.getElementsByTagName('span')[0].innerText = 'Ξ ' + endPrice;
+                            }
+                        }
+                    } else {
                     }
                 }
             }
@@ -383,5 +440,15 @@ $(document).ready(() => {
                 changePrices();
             }
         }
+
+        let mItems = document.getElementsByClassName('KittyStatus KittyStatus--multiple');
+         [...mItems].forEach((i)=>{
+             let replace = i.children[1].innerHTML.replace("Resting", "");
+             let hasText = i.children[1].getElementsByClassName("KittyStatus-note")[0];
+             if(hasText && hasText.textContent && hasText.textContent !== '') {
+                 i.children[1].innerHTML = replace;
+             }
+             i.classList.remove('KittyStatus--multiple');
+        });
     });
 });
