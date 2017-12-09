@@ -85,7 +85,7 @@ $(document).ready(() => {
     let currency = localStorage.getItem('kittyExtensionEtherUSD') || "💲👎";
 
     $.get("https://api.coinmarketcap.com/v1/ticker/ethereum/", data => {
-        ethPrice =  parseInt(data[0].price_usd);
+        ethPrice =  parseFloat(data[0].price_usd);
         $("body").append("<button onclick='switchPrice(event)' class='extUSD extAtt'>"+currency+"</button>");
         changePrices();
     });
@@ -409,7 +409,7 @@ $(document).ready(() => {
                                 item.getElementsByTagName('span')[0].innerText = '$ ' + endPrice;
                             }
                         } else if (currency == "💲👎" && cur[0] != "Ξ") {
-                            let endPrice = (cur[1] / ethPrice ).toFixed(2);
+                            let endPrice = (cur[1] / ethPrice ).toFixed(4);
                             if (endPrice != 'NaN') {
                                 item.getElementsByTagName('span')[0].innerText = 'Ξ ' + endPrice;
                             }
