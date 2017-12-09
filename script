@@ -24,16 +24,119 @@ var c = Babel.transform(inline_src, { presets: [ "es2015", "es2016" ] });
 eval(c.code);
 /* jshint ignore:end */
 
-$(document).ready(() => {
+const getJSON = (url) => fetch(url).then(response => response.json());
+let switchPrice;
+
+const rarityTable = {
+  "oldlace":{"count":0.017},
+  "wolfgrey":{"count":0.0421},
+  "gerbil":{"count":0.0754},
+  "cottoncandy":{"count":0.13},
+  "violet":{"count":0.2525},
+  "wingtips":{"count":0.267},
+  "mainecoon":{"count":0.4731},
+  "jaguar":{"count":0.8789},
+  "cerulian":{"count":1.0146},
+  "chartreux":{"count":1.3721},
+  "googly":{"count":1.4286},
+  "fabulous":{"count":1.509},
+  "whixtensions":{"count":1.651},
+  "peach":{"count":3.1255},
+  "bubblegum":{"count":3.4188},
+  "dali":{"count":3.5325},
+  "otaku":{"count":4.0565},
+  "skyblue":{"count":4.8908},
+  "gold":{"count":5.0987},
+  "bloodred":{"count":5.2143},
+  "scarlet":{"count":5.306},
+  "tigerpunk":{"count":5.4725},
+  "limegreen":{"count":5.8042},
+  "beard":{"count":6.6335},
+  "cloudwhite":{"count":6.9049},
+  "emeraldgreen":{"count":7.1863},
+  "laperm":{"count":7.5752},
+  "spock":{"count":7.5966},
+  "calicool":{"count":7.6506},
+  "barkbrown":{"count":7.7587},
+  "chestnut":{"count":8.5854},
+  "tongue":{"count":9.2476},
+  "mauveover":{"count":9.6534},
+  "cymric":{"count":11.437},
+  "shadowgrey":{"count":13.4737},
+  "coffee":{"count":13.5572},
+  "saycheese":{"count":14.4958},
+  "salmon":{"count":14.6102},
+  "royalpurple":{"count":14.9337},
+  "mintgreen":{"count":15.7441},
+  "swampgreen":{"count":16.1462},
+  "chocolate":{"count":16.1606},
+  "lemonade":{"count":16.4333},
+  "sphynx":{"count":16.5715},
+  "topaz":{"count":16.6437},
+  "simple":{"count":16.765},
+  "orangesoda":{"count":17.0533},
+  "aquamarine":{"count":17.304},
+  "greymatter":{"count":17.3587},
+  "munchkin":{"count":17.6967},
+  "raisedbrow":{"count":18.5435},
+  "happygokitty":{"count":19.4054},
+  "soserious":{"count":19.6398},
+  "strawberry":{"count":20.2291},
+  "ragamuffin":{"count":20.3453},
+  "sizzurp":{"count":20.9509},
+  "himalayan":{"count":21.047},
+  "pouty":{"count":21.7745},
+  "crazy":{"count":26.5899},
+  "thicccbrowz":{"count":27.3055},
+  "luckystripe":{"count":28.8785},
+  "kittencream":{"count":40.046},
+  "granitegrey":{"count":40.8979},
+  "totesbasic":{"count":45.9847}
+};
+
+const cooldownList = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
+const cooldownValueList = ["Fast","Swift","Swift","Snappy","Snappy","Brisk","Brisk","Plodding","Plodding","Slow","Slow","Sluggish","Sluggish","Catatonic"];
+
+
+const getRarityColor = (rarity) => {
+    if (rarity <= 0.15) return '#ff0dbf'; // legendary
+    if (rarity <= 1.8) return '#ff8000'; // legendary
+    if (rarity <= 8) return '#a335ee'; // epic
+    if (rarity <= 16) return '#0070ff'; // rare
+    return 'white';
+};
+
+const getMultiplier = (perc) => {
+    if (perc <= 0.4) return 1.55;
+    if (perc <= 1.8) return 1.25;
+    if (perc <= 5) return 1.05;
+    if (perc <= 10) return 1.025;
+    return 1;
+};
+
+const getAttrScore = (perc) => {
+    if (perc <= 0.4) return 3;
+    if (perc <= 1.8) return 2;
+    if (perc <= 5) return 1;
+    if (perc <= 10) return 1;
+    return 0;
+};
+
+
+const onReady = () => {
     console.log('CryptoKitties Extension Loaded');
-    $("head").append("<style> .extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; } </style>");
-    $("head").append("<style> .extAtt { min-width: 75px; padding-left: 2px; padding-right: 2px; color: rgba(255,255,255, 0.99); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-color: rgba(66, 66, 66, 0.35); border-width: 1.5px; border-radius: 20px; background-color: #00bcd4; } </style>");
-    $("head").append("<style> .extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); } </style>");
-    $("head").append("<style> .extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
-    $("head").append("<style> .extUSD {  z-index: 100; position:absolute; top:0; left:0; box-shadow: 0 3px rgba(143, 141, 138, 0.6); border-width: 0.5px; background-color: #dff7f1; } </style>");
-    $("head").append("<style> .extUSD:focus {  outline:0; } .extUSD:active {  box-shadow: 0 1px rgba(143, 141, 118, 0.6); transform: translateY(2px);} .extUSD:hover {background-color:#dff7f1;}</style>");
-    $("head").append("<style> .extCD {  font-size: 1.1rem; font-weight: 100; } </style>");
-    $("head").append("<style> .KittyCard { overflow: visible; } </style>");
+    const extensionCSS = `
+.extAttUl { overflow: visible; z-index: 3;  padding: 0px; margin: 0px; }
+.extAtt { min-width: 75px; padding-left: 2px; padding-right: 2px; color: rgba(255,255,255, 0.99); text-align: center; line-height: 1.85rem; font-size: 1.6rem; border-style: solid; border-color: rgba(66, 66, 66, 0.35); border-width: 1.5px; border-radius: 20px; background-color: #00bcd4; }
+.extBounce {animation: mover 1s infinite  alternate; padding-right: 2px;} @keyframes mover {0% { transform: translateY(0); }100% { transform: translateY(-6px); }
+.extWrapper {position:absolute; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; }
+.extUSD {  z-index: 100; position:absolute; top:0; left:0; box-shadow: 0 3px rgba(143, 141, 138, 0.6); border-width: 0.5px; background-color: #dff7f1; }
+.extUSD:focus {  outline:0; } .extUSD:active {  box-shadow: 0 1px rgba(143, 141, 118, 0.6); transform: translateY(2px);} .extUSD:hover {background-color:#dff7f1;}
+.extCD {  font-size: 1.1rem; font-weight: 100; }
+.KittyCard { overflow: visible; }`;
+    const css = document.createElement('style');
+    css.innerHTML = extensionCSS;
+    document.head.appendChild(css);
 
     const version = "0.31";
     let foundId = [];
@@ -52,7 +155,7 @@ $(document).ready(() => {
             }
         });
     }, true);
-    let tbl = {"oldlace":{"count":0.017},"wolfgrey":{"count":0.0421},"gerbil":{"count":0.0754},"cottoncandy":{"count":0.13},"violet":{"count":0.2525},"wingtips":{"count":0.267},"mainecoon":{"count":0.4731},"jaguar":{"count":0.8789},"cerulian":{"count":1.0146},"chartreux":{"count":1.3721},"googly":{"count":1.4286},"fabulous":{"count":1.509},"whixtensions":{"count":1.651},"peach":{"count":3.1255},"bubblegum":{"count":3.4188},"dali":{"count":3.5325},"otaku":{"count":4.0565},"skyblue":{"count":4.8908},"gold":{"count":5.0987},"bloodred":{"count":5.2143},"scarlet":{"count":5.306},"tigerpunk":{"count":5.4725},"limegreen":{"count":5.8042},"beard":{"count":6.6335},"cloudwhite":{"count":6.9049},"emeraldgreen":{"count":7.1863},"laperm":{"count":7.5752},"spock":{"count":7.5966},"calicool":{"count":7.6506},"barkbrown":{"count":7.7587},"chestnut":{"count":8.5854},"tongue":{"count":9.2476},"mauveover":{"count":9.6534},"cymric":{"count":11.437},"shadowgrey":{"count":13.4737},"coffee":{"count":13.5572},"saycheese":{"count":14.4958},"salmon":{"count":14.6102},"royalpurple":{"count":14.9337},"mintgreen":{"count":15.7441},"swampgreen":{"count":16.1462},"chocolate":{"count":16.1606},"lemonade":{"count":16.4333},"sphynx":{"count":16.5715},"topaz":{"count":16.6437},"simple":{"count":16.765},"orangesoda":{"count":17.0533},"aquamarine":{"count":17.304},"greymatter":{"count":17.3587},"munchkin":{"count":17.6967},"raisedbrow":{"count":18.5435},"happygokitty":{"count":19.4054},"soserious":{"count":19.6398},"strawberry":{"count":20.2291},"ragamuffin":{"count":20.3453},"sizzurp":{"count":20.9509},"himalayan":{"count":21.047},"pouty":{"count":21.7745},"crazy":{"count":26.5899},"thicccbrowz":{"count":27.3055},"luckystripe":{"count":28.8785},"kittencream":{"count":40.046},"granitegrey":{"count":40.8979},"totesbasic":{"count":45.9847}};
+    let tbl = rarityTable;
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
             storageMyTbl['id'+id] = cattributes;
@@ -84,38 +187,29 @@ $(document).ready(() => {
     let storageMyTbl = JSON.parse(localStorage.getItem('kittyExtensionMyTbl')) || {};
     let currency = localStorage.getItem('kittyExtensionEtherUSD') || "💲👎";
 
-    $.get("https://api.coinmarketcap.com/v1/ticker/ethereum/", data => {
-        ethPrice =  parseFloat(data[0].price_usd);
-        $("body").append("<button onclick='switchPrice(event)' class='extUSD extAtt'>"+currency+"</button>");
+    getJSON("https://api.coinmarketcap.com/v1/ticker/ethereum/").then(data => {
+        ethPrice = parseFloat(data[0].price_usd);
+        console.log('Kitty: ETH Price is', ethPrice);
+        const button = document.createElement('button');
+        button.addEventListener('click', switchPrice, false);
+        button.className = 'extUSD extAtt';
+        button.innerHTML = currency;
+        document.body.appendChild(button)
         changePrices();
     });
     function getColor(catt) {
-        let color, count;
-        if (tbl[catt]) {
-            if (tbl[catt].count <= 0.15) {
-                color = "#ff0dbf"; // legendary
-            } else if (tbl[catt].count <= 1.8) {
-                color = "#ff8000"; // legendary
-            } else if (tbl[catt].count < 8) {
-                color = "#a335ee"; // epic
-            } else if (tbl[catt].count <= 16) {
-                color = "#0070ff"; // rare
-            } else if (tbl[catt].count <= 20) {
-                color = "white";   // common
-            } else {
-                color = "white";   // common
-            }
-            count = tbl[catt].count < 1 ? tbl[catt].count.toFixed(3) : tbl[catt].count.toFixed(1);
-            count = tbl[catt].count <= 20 ? " ("+ count +"%)" : " (20%+)";
-        } else {
-            color = "rgba(255,255,255, 0.98)";
-            count = " (Ultra%)";
-        }
+        const attr = tbl[catt];
+        const perc = attr && attr.count;
+        const color = attr ? getRarityColor(perc) : "rgba(255,255,255, 0.98)";
+        const rounded = attr ? (perc < 1 ? perc.toFixed(3) : perc.toFixed(1)) : '0.00'
+        const count = attr ?
+            perc <= 20 ? " ("+ rounded +"%)" : " (20%+)" :
+            " (Ultra%)";
         return [color, count];
     }
 
     function requestId(element, stats) {
-        $.getJSON( "https://api.cryptokitties.co/kitties/"+stats.id, data => {
+        getJSON("https://api.cryptokitties.co/kitties/" + stats.id).then(data => {
             finalizeOverlay(data.cattributes, element, stats);
             if (hasLocalStorage) {
                 if (data.children.length === 0) {
@@ -131,7 +225,7 @@ $(document).ready(() => {
                 }
                 saveStorage(stats.id, data.cattributes);
             }
-        }).fail(() => {
+        }, () => {
             let ul = element.getElementsByClassName("extAttUl")[0];
             ul.classList.remove("extBounce");
             ul.innerHTML = "😿";
@@ -174,9 +268,9 @@ $(document).ready(() => {
             }
         }
 
-        //if (window.location.hostname == 'www.cryptokitties.co') {
-            //calcPrice(stats.id , cattributes, stats, element);
-        //}
+        if (window.location.hostname == 'www.cryptokitties.co') {
+            calcPrice(stats.id , cattributes, stats, element);
+        }
     }
 
     function isValidId(id) {
@@ -202,8 +296,7 @@ $(document).ready(() => {
                     }
                     let speed = nativeElement.getElementsByClassName('KittyCard-coldown')[0];
                     if (speed) {
-                        let cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
-                        stats.fast = cdTbl.indexOf(speed.innerText);
+                        stats.fast = cooldownList.indexOf(speed.innerText);
                     }
                     stats.gen = nativeElement.getElementsByClassName('KittyCard-subname')[0].innerText.split('Gen ').pop();
                 }
@@ -250,144 +343,91 @@ $(document).ready(() => {
     function calcPrice(id, cattributes, stats, element) {
         let base = "https://api.cryptokitties.co/auctions";
         let query = "?type=sale&limit=15&sorting=cheap&orderBy=current_price&orderDirection=asc&sorting=cheap&status=open&search=";
-        let totalGen = ' gen:'+stats.gen;
+        let totalGen = 'gen:' + stats.gen;
         if (stats.gen >= 10) {
-            totalGen += ' gen:'+(stats.gen-1)+' gen:';
+            totalGen += 'gen:'+(stats.gen-1)+' gen:';
             totalGen += parseInt(stats.gen)+1;
         }
         let rareTbl = getBestRares(cattributes);
         let search = totalGen + rareTbl[0];
+        console.log('totalGen', totalGen);
+        console.log('rareTbl', rareTbl[0]);
 
-        function finishPrice(data, index) {
-            let newMultiplier = stats.id == data.auctions[index].kitty.id ? 1 : rareTbl[1];
-            let nomralizePrice = data.auctions[index].current_price/1000000000000000000;
-            return (nomralizePrice*newMultiplier).toFixed(2);
-        }
-        $.getJSON( base+query+search, (data) => {
-            if (data.total > 0) {
-                if (data.total == 1) {
-                    if (data.auctions[0].kitty.id == id) {
-                        renderPrice(element, 'Name your price', query + search, false);
-                    } else {
-                        renderPrice(element, finishPrice(data, 0), query + search, true);
-                    }
-                } else {
-                    let cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
-                    let cdValueTbl = ["Fast","Swift","Swift","Snappy","Snappy","Brisk","Brisk","Plodding","Plodding","Slow","Slow","Sluggish","Sluggish","Catatonic"];
-                    for (let x in data.auctions) {
-                        let cdValue = cdTbl.indexOf(cdValueTbl[data.auctions[x].kitty.status.cooldown_index]);
-                        if (stats.cd && stats.fast > 1) {
-                            renderPrice(element, finishPrice(data, x), query + search, false);
-                            return;
-                        } else if (stats.fast > 4 ||  stats.fast >= cdValue) {
-                            renderPrice(element, finishPrice(data, x), query + search, false);
-                            return;
-                        } else if (stats.cd && data.auctions[x].kitty.status.is_ready) {
-                            renderPrice(element, finishPrice(data, x), query + search, false);
-                            return;
-                        } if (x == data.auctions.length - 1) {
-                            renderPrice(element, finishPrice(data, x), query + search, true);
-                            return;
-                        }
-                    }
-
-
-                }
+        const finalizePrice = (auction) => {
+            const newMultiplier = stats.id == auction.kitty.id ? 1 : rareTbl[1];
+            const nomralizePrice = auction.current_price / 1000000000000000000;
+            return (nomralizePrice * newMultiplier).toFixed(2);
+        };
+        getJSON(base + query + search).then(data => {
+            const rend = (price, isFast) => renderPrice(query + search, element, price, isFast)
+            console.log(data);
+            if (data.total <= 0) return rend(null, false);
+            if (data.total === 1) {
+                const first = data.auctions[0];
+                first.kitty.id === id ?
+                    rend(null, false) :
+                    rend(finalizePrice(first), true);
             } else {
-                renderPrice(element, 'Name your price', query + search, false);
+                for (let x = 0; x < data.auctions.length; x++) {
+                    const isLastItem = x === (data.auctions.length - 1);
+                    const auction = data.auctions[x];
+                    const cooldownValue = cooldownList.indexOf(cooldownValueList[auction.kitty.status.cooldown_index]);
+                    if ((stats.cd && stats.fast > 1) ||
+                        (stats.fast > 4 || stats.fast >= cooldownValue) ||
+                        (stats.cd && auction.kitty.status.is_ready) ||
+                        (isLastItem)) {
+                        rend(finalizePrice(auction), isLastItem);
+                    }
+                }
             }
-        }).fail(() => {
-
         });
     }
 
-    function renderPrice(element, price, url, fast) {
+    function renderPrice(url, element, price, isFast) {
+        console.log('PRICING IS', price);
         if (price >= 50) {
-            price = Math.ceil(price / 10) * 10;
+            price = (Math.ceil(price / 10) * 10).toString();
             price += '+';
-        } else if (fast) {
-            price += '+';
+        } else if (isFast) {
+            price = price.toString() + '+';
         }
+        if (price == null) price = 'Name your price';
+        console.log('Rendering price', url, price);
         let ul = element.getElementsByClassName("extWrapper")[0];
         ul.innerHTML += "<ul class='extAttUl' onclick='searchSimilarKitties(event, &quot;"+ url +"&quot;)'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>Score:</span> " + price + "</li></ul>";
     }
 
-    function getBestRares(cattributes, adjust) {
-        let newCatts = [];
-        for (let single in cattributes) {
-            newCatts.push(cattributes[single].description);
-        }
-        cattributes = newCatts;
+    function getBestRares(attrs, adjust) {
+        const cattributes = Object.keys(attrs).map(attr => attrs[attr].description)
+        const isFancy = cattributes.length === 0;
         let best = '';
         let hasRare = false;
         let count = adjust || 0;
+        let score = isFancy ? 8 : 0;
 
-        if (cattributes.length === 0) {
-            hasRare = ' type:fancy';
-        }
-        for (let x in cattributes) {
+        if (isFancy) hasRare = ' type:fancy';
+        cattributes.forEach(x => {
             if (!tbl[cattributes[x]]) {
                 best += ' ' + x;
                 count += 3;
                 hasRare = ' ' + x;
             }
-        }
-        let score = 0;
-        let multiplier = 1;
-        let multCount = 0;
-        for (let key1 in tbl) {
-            if (tbl[key1].count) {
-                for (let key in cattributes) {
-                    if (tbl[key1].count <= 0.4) {
-                        multiplier *= 1.55;
-                    } else if(tbl[key1].count <= 1.8) {
-                        multiplier *= 1.25;
-                    } else if (tbl[key1].count <= 5) {
-                        multiplier *= 1.05;
-                    } else if (tbl[key1].count <= 10) {
-                        multiplier *= 1.025;
-                    }
-                }
-            }
-        }
-        console.log(multiplier);
-        for (let key in tbl) {
-            if (cattributes.includes(key)) {
-                if (tbl[key].count <= 1.2) {
-                } else if (tbl[key].count <= 6) {
-                }
-            }
-            if (count >= 3) {
-                return [' ' + best, multiplier];
-            }
-        }
+        });
         let attrCount = 0;
-        cattributes.forEach((key)=>{
-            if (tbl[key]) {
-                if (tbl[key].count <= 0.4) {
-                    attrCount += 3;
-                } else if(tbl[key].count <= 1.8) {
-                    attrCount += 2;
-                } else if (tbl[key].count <= 5) {
-                    attrCount += 1;
-                } else if (tbl[key].count <= 10) {
-                    attrCount += 1;
-                } else {
-                    score += 0;
-                }
+        cattributes.forEach(attr => {
+            if (tbl[attr]) {
+                const toAdd = getAttrScore(tbl[attr].count);
+                attrCount += toAdd;
             } else {
                 attrCount += 5;
             }
-            score = ((attrCount/6)*7)+1;
-            console.log(score);
-            if (cattributes.length === 0) {
-                score = 8;
-            } else if (cattributes.length > 8) {
-                score -= cattributes.length - 8;
-            }
         });
-            console.log('score',score);
-        return score;
+        if (!isFancy) score = (attrCount / 6 * 7) + 1;
+        if (cattributes.length > 8) {
+            score -= cattributes.length - 8;
+        }
+        console.log('Cat score is', score);
+        return [best, score];
     }
 
     document.searchSimilarKitties = (e, query) => {
@@ -422,7 +462,7 @@ $(document).ready(() => {
     }
 
     let saleNum = 0;
-    document.switchPrice = (e) => {
+    switchPrice = (e) => {
         e.preventDefault();
         hasChanged = true;
         let element = document.getElementsByClassName('extUSD')[0];
@@ -432,8 +472,8 @@ $(document).ready(() => {
         changePrices();
     };
 
-    $(document).bind('DOMSubtreeModified',function(){
-        let items = document.getElementsByClassName('KittyStatus-itemText');
+    document.addEventListener('DOMSubtreeModified', () => {
+        const items = document.getElementsByClassName('KittyStatus-itemText');
         if (items.length != saleNum) {
             saleNum = items.length;
             if (hasChanged || currency == "💲👍") {
@@ -451,4 +491,13 @@ $(document).ready(() => {
              i.classList.remove('KittyStatus--multiple');
         });
     });
-});
+};
+
+if (document.readyState === 'complete') {
+    onReady();
+} else {
+    document.addEventListener('readystatechange', () => {
+        if (document.readyState === 'complete') onReady();
+    });
+}
+
