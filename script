@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.31
+// @version      0.32
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -9,20 +9,6 @@
 // @require      https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.2/babel.js
 // @require      http://code.jquery.com/jquery-3.2.1.min.js
 // ==/UserScript==
-
-/* jshint ignore:start */
-var inline_src = (<><![CDATA[
-/* jshint ignore:end */
-    /* jshint esnext: false */
-    /* jshint esversion: 6 */
-
-    // Your code here...
-
-/* jshint ignore:start */
-]]></>).toString();
-var c = Babel.transform(inline_src, { presets: [ "es2015", "es2016" ] });
-eval(c.code);
-/* jshint ignore:end */
 
 $(document).ready(() => {
     console.log('CryptoKitties Extension Loaded');
@@ -35,7 +21,7 @@ $(document).ready(() => {
     $("head").append("<style> .extCD {  font-size: 1.1rem; font-weight: 100; } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
 
-    const version = "0.31";
+    const version = "0.32";
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
@@ -52,7 +38,16 @@ $(document).ready(() => {
             }
         });
     }, true);
-    let tbl = {"oldlace":{"count":0.017},"wolfgrey":{"count":0.0421},"gerbil":{"count":0.0754},"cottoncandy":{"count":0.13},"violet":{"count":0.2525},"wingtips":{"count":0.267},"mainecoon":{"count":0.4731},"jaguar":{"count":0.8789},"cerulian":{"count":1.0146},"chartreux":{"count":1.3721},"googly":{"count":1.4286},"fabulous":{"count":1.509},"whixtensions":{"count":1.651},"peach":{"count":3.1255},"bubblegum":{"count":3.4188},"dali":{"count":3.5325},"otaku":{"count":4.0565},"skyblue":{"count":4.8908},"gold":{"count":5.0987},"bloodred":{"count":5.2143},"scarlet":{"count":5.306},"tigerpunk":{"count":5.4725},"limegreen":{"count":5.8042},"beard":{"count":6.6335},"cloudwhite":{"count":6.9049},"emeraldgreen":{"count":7.1863},"laperm":{"count":7.5752},"spock":{"count":7.5966},"calicool":{"count":7.6506},"barkbrown":{"count":7.7587},"chestnut":{"count":8.5854},"tongue":{"count":9.2476},"mauveover":{"count":9.6534},"cymric":{"count":11.437},"shadowgrey":{"count":13.4737},"coffee":{"count":13.5572},"saycheese":{"count":14.4958},"salmon":{"count":14.6102},"royalpurple":{"count":14.9337},"mintgreen":{"count":15.7441},"swampgreen":{"count":16.1462},"chocolate":{"count":16.1606},"lemonade":{"count":16.4333},"sphynx":{"count":16.5715},"topaz":{"count":16.6437},"simple":{"count":16.765},"orangesoda":{"count":17.0533},"aquamarine":{"count":17.304},"greymatter":{"count":17.3587},"munchkin":{"count":17.6967},"raisedbrow":{"count":18.5435},"happygokitty":{"count":19.4054},"soserious":{"count":19.6398},"strawberry":{"count":20.2291},"ragamuffin":{"count":20.3453},"sizzurp":{"count":20.9509},"himalayan":{"count":21.047},"pouty":{"count":21.7745},"crazy":{"count":26.5899},"thicccbrowz":{"count":27.3055},"luckystripe":{"count":28.8785},"kittencream":{"count":40.046},"granitegrey":{"count":40.8979},"totesbasic":{"count":45.9847}};
+
+    let tbl = {
+        "Genesis":{"count": ' (One)'},
+        "BugCat":{"count": ' (Three)'},
+        "Mistletoe":{"count": 0.00015},
+        "Dracula":{"count": 0.068},
+        "ShipCat":{"count": 0.256},
+        "DuCat":{"count": 1.195},
+        "royalblue":{"count":0.0005},"oldlace":{"count":0.1238},"wolfgrey":{"count":0.1573},"gerbil":{"count":0.264},"wingtips":{"count":0.2901},"cottoncandy":{"count":0.5491},"mainecoon":{"count":0.5571},"violet":{"count":0.6283},"cerulian":{"count":1.0206},"jaguar":{"count":1.4445},"fabulous":{"count":1.4986},"chartreux":{"count":1.5858},"whixtensions":{"count":2.5648},"googly":{"count":2.5998},"bubblegum":{"count":3.3429},"dali":{"count":3.3574},"peach":{"count":3.6265},"otaku":{"count":4.1079},"skyblue":{"count":4.8685},"tigerpunk":{"count":5.0935},"limegreen":{"count":5.7162},"bloodred":{"count":5.7528},"scarlet":{"count":5.7849},"beard":{"count":6.5119},"cloudwhite":{"count":6.7338},"gold":{"count":7.1276},"laperm":{"count":7.4273},"calicool":{"count":7.4568},"barkbrown":{"count":7.6527},"emeraldgreen":{"count":7.797},"spock":{"count":8.4118},"chestnut":{"count":8.497},"tongue":{"count":8.7189},"mauveover":{"count":10.6008},"cymric":{"count":12.4776},"shadowgrey":{"count":13.3239},"coffee":{"count":13.5203},"salmon":{"count":14.5649},"royalpurple":{"count":14.9587},"mintgreen":{"count":15.3345},"saycheese":{"count":15.7925},"swampgreen":{"count":15.8987},"chocolate":{"count":16.066},"lemonade":{"count":16.1111},"sphynx":{"count":16.2664},"topaz":{"count":16.3651},"simple":{"count":16.5706},"greymatter":{"count":16.7334},"orangesoda":{"count":16.8246},"aquamarine":{"count":17.2214},"munchkin":{"count":17.6628},"raisedbrow":{"count":18.3417},"soserious":{"count":18.955},"happygokitty":{"count":18.9795},"strawberry":{"count":19.9114},"ragamuffin":{"count":19.9169},"sizzurp":{"count":20.3563},"himalayan":{"count":20.7927},"pouty":{"count":21.4897},"crazy":{"count":26.1442},"thicccbrowz":{"count":27.0897},"luckystripe":{"count":28.0461},"kittencream":{"count":39.1319},"granitegrey":{"count":40.3389},"totesbasic":{"count":46.1874}};
+
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
             storageMyTbl['id'+id] = cattributes;
@@ -91,24 +86,31 @@ $(document).ready(() => {
     });
     function getColor(catt) {
         let color, count;
-        if (tbl[catt]) {
-            if (tbl[catt].count <= 0.15) {
+        if (catt == 'Fancy' || catt == 'Exclusive') {
+            //To Do?
+        } else if (tbl[catt]) {
+            let uniqe = typeof tbl[catt].count == 'string';
+            if (uniqe || tbl[catt].count <= 0.27) {
                 color = "#ff0dbf"; // legendary
             } else if (tbl[catt].count <= 1.8) {
-                color = "#ff8000"; // legendary
+                color = "#ff8000"; // very rare
             } else if (tbl[catt].count < 8) {
-                color = "#a335ee"; // epic
+                color = "#a335ee"; // rare
             } else if (tbl[catt].count <= 16) {
-                color = "#0070ff"; // rare
+                color = "#0070ff"; // uncommon
             } else if (tbl[catt].count <= 20) {
                 color = "white";   // common
             } else {
                 color = "white";   // common
             }
-            count = tbl[catt].count < 1 ? tbl[catt].count.toFixed(3) : tbl[catt].count.toFixed(1);
-            count = tbl[catt].count <= 20 ? " ("+ count +"%)" : " (20%+)";
+            if (uniqe) {
+                count = tbl[catt].count;
+            } else {
+                count = tbl[catt].count < 1 ? tbl[catt].count.toFixed(3) : tbl[catt].count.toFixed(1);
+                count = tbl[catt].count <= 20 ? " ("+ count +"%)" : " (20%+)";
+            }
         } else {
-            color = "rgba(255,255,255, 0.98)";
+            color = "#ff0dbf";
             count = " (Ultra%)";
         }
         return [color, count];
@@ -239,8 +241,10 @@ $(document).ready(() => {
                         let color = arr[0];
                         let num = arr[1];
                         cattributes[att].style.backgroundColor = color;
-                        cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
-                        cattributes[att].innerHTML += num;
+                        if (num) {
+                            cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
+                        }
+                        cattributes[att].innerHTML += num ? num : '';
                     }
                 }
             }
