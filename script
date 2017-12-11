@@ -132,7 +132,7 @@ $(document).ready(() => {
 
                 if (!data.status.is_ready) {
                     let note = element.getElementsByClassName('KittyStatus-note');
-                    if (note) {
+                    if (note.length != 0) {
                         let cd = (((data.status.cooldown - Date.now())/6000/600));
                         let time = timeDisplay(cd * 3600);
                         note[note[1] ? 1 : 0].textContent = time;
