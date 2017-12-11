@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.33
+// @version      0.34
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -24,20 +24,20 @@ $(document).ready(() => {
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
     $("head").append("<style> .extKittyWrapper {position:relative; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
 
-    const version = "0.33";
+    const version = "0.34";
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
     let hasChanged = false;
     let ethPrice = false;
-    let url = location.href;
+    let url = location.pathname;
     let restrictAPI = 0;
     document.body.addEventListener('click', () => {
         requestAnimationFrame(()=> {
-            if (url!==location.href) {
+            if (url !== location.pathname) {
                 //Clears id cache on page change
                 foundId = [];
-                url = location.href;
+                url = location.pathname;
             }
         });
     }, true);
@@ -77,7 +77,9 @@ $(document).ready(() => {
 
     $.get("https://api.coinmarketcap.com/v1/ticker/ethereum/", data => {
         ethPrice =  parseFloat(data[0].price_usd);
-        $("body").append("<button onclick='switchPrice(event)' class='extUSD extAtt'>"+currency+"</button>");
+        if (window.location.hostname == 'www.cryptokitties.co') {
+            $("body").append("<button onclick='switchPrice(event)' class='extUSD extAtt'>"+currency+"</button>");
+        }
         changePrices();
     });
     function getColor(catt) {
@@ -125,7 +127,7 @@ $(document).ready(() => {
 
                 if (!data.status.is_ready) {
                     let note = element.getElementsByClassName('KittyStatus-note');
-                    if (note.length != 0) {
+                    if (note.length !== 0) {
                         let cd = (((data.status.cooldown - Date.now())/6000/600));
                         let time = timeDisplay(cd * 3600);
                         note[note[1] ? 1 : 0].textContent = time;
@@ -134,9 +136,12 @@ $(document).ready(() => {
                 saveStorage(stats.id, data.cattributes);
             }
         }).fail(() => {
-            let ul = element.getElementsByClassName("extAttUl")[0];
-            ul.classList.remove("extBounce");
-            ul.innerHTML = "😿";
+            //let ul = element.getElementsByClassName("extAttUl")[0];
+            //ul.classList.remove("extBounce");
+            //ul.innerHTML = "😿";
+            setTimeout(() => {
+                requestId(element, stats);
+            }, 1000);
         });
     }
 
@@ -221,10 +226,10 @@ $(document).ready(() => {
                     requestId(element, stats);
                 }, timer - Date.now());
 
-                restrictAPI += 1000;
+                restrictAPI += 250;
                 setTimeout(()=> {
-                    restrictAPI -= 1000;
-                }, 1000);
+                    restrictAPI -= 250;
+                }, 250);
                 timer = Date.now() + restrictAPI;
             }
         }
