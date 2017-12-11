@@ -125,14 +125,18 @@ $(document).ready(() => {
             if (hasLocalStorage) {
                 if (data.children.length === 0) {
                     let ul = element.getElementsByClassName("extWrapper")[0];
-                    ul.innerHTML += "<ul class='extAttUl'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>&nbsp;virgin&nbsp;</span></li></ul>";
+                    if (ul) {
+                        ul.innerHTML += "<ul class='extAttUl'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>&nbsp;virgin&nbsp;</span></li></ul>";
+                    }
                 }
 
                 if (!data.status.is_ready) {
                     let note = element.getElementsByClassName('KittyStatus-note');
-                    let cd = (((data.status.cooldown - Date.now())/6000/600));
-                    let time = timeDisplay(cd * 3600);
-                    note[note[1] ? 1 : 0].textContent = time;
+                    if (note) {
+                        let cd = (((data.status.cooldown - Date.now())/6000/600));
+                        let time = timeDisplay(cd * 3600);
+                        note[note[1] ? 1 : 0].textContent = time;
+                    }
                 }
                 saveStorage(stats.id, data.cattributes);
             }
