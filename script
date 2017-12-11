@@ -5,6 +5,8 @@
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
+// @match        *kittytools.herokuapp.com/*
+// @match        *kittygenerations.herokuapp.com/*
 // @grant        none
 // @require      https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.2/babel.js
 // @require      http://code.jquery.com/jquery-3.2.1.min.js
@@ -20,6 +22,7 @@ $(document).ready(() => {
     $("head").append("<style> .extUSD:focus {  outline:0; } .extUSD:active {  box-shadow: 0 1px rgba(143, 141, 118, 0.6); transform: translateY(2px);} .extUSD:hover {background-color:#dff7f1;}</style>");
     $("head").append("<style> .extCD {  font-size: 1.1rem; font-weight: 100; } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
+    $("head").append("<style> .extKittyWrapper {position:relative; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
 
     const version = "0.33";
     let foundId = [];
@@ -115,14 +118,18 @@ $(document).ready(() => {
             if (hasLocalStorage) {
                 if (data.children.length === 0) {
                     let ul = element.getElementsByClassName("extWrapper")[0];
-                    ul.innerHTML += "<ul class='extAttUl'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>&nbsp;virgin&nbsp;</span></li></ul>";
+                    if (ul) {
+                        ul.innerHTML += "<ul class='extAttUl'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>&nbsp;virgin&nbsp;</span></li></ul>";
+                    }
                 }
 
                 if (!data.status.is_ready) {
                     let note = element.getElementsByClassName('KittyStatus-note');
-                    let cd = (((data.status.cooldown - Date.now())/6000/600));
-                    let time = timeDisplay(cd * 3600);
-                    note[note[1] ? 1 : 0].textContent = time;
+                    if (note.length != 0) {
+                        let cd = (((data.status.cooldown - Date.now())/6000/600));
+                        let time = timeDisplay(cd * 3600);
+                        note[note[1] ? 1 : 0].textContent = time;
+                    }
                 }
                 saveStorage(stats.id, data.cattributes);
             }
@@ -187,7 +194,8 @@ $(document).ready(() => {
             curId = id;
             foundId.push(id);
             let mainSite = window.location.hostname == 'www.cryptokitties.co';
-            let element = mainSite ? nativeElement.getElementsByClassName('KittyCard')[0] : nativeElement;
+            let toolsSite = window.location.hostname == 'kittytools.herokuapp.com';
+            let element = mainSite ? nativeElement.getElementsByClassName('KittyCard')[0] : toolsSite ? nativeElement.parentElement : nativeElement;
             if (element) {
                 let stats = {"id": curId, "fast":false, "gen": false, "cd": false};
                 if (mainSite) {
@@ -203,7 +211,11 @@ $(document).ready(() => {
                     stats.gen = nativeElement.getElementsByClassName('KittyCard-subname')[0].innerText.split('Gen ').pop();
                 }
                 element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
-
+                if (toolsSite) {
+                    let wrapper = element.getElementsByClassName("extWrapper")[0];
+                    wrapper.classList.remove("extWrapper");
+                    wrapper.classList.add("extKittyWrapper");
+                }
                 setTimeout(()=> {
                     console.log('KittyExtension: Requesting - '+ id);
                     requestId(element, stats);
