@@ -25,6 +25,12 @@ $(document).ready(() => {
     $("head").append("<style> .extKittyWrapper {position:relative; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
 
     const version = "0.34";
+
+    let orderedCattributes = [];
+    $.getJSON( "https://api.cryptokitties.co/cattributes?type=true", data => {
+        data.sort((a,b) => (a.type == b.type) ? 0 : ((a.type < b.type) ? -1 : 1)); // group by cattribute type
+        orderedCattributes = data.map(attr => attr.description);
+    })
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
