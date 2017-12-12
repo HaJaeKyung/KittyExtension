@@ -1,28 +1,16 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.31
+// @version      0.34
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
+// @match        *kittytools.herokuapp.com/*
+// @match        *kittygenerations.herokuapp.com/*
 // @grant        none
 // @require      https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.18.2/babel.js
 // @require      http://code.jquery.com/jquery-3.2.1.min.js
 // ==/UserScript==
-
-/* jshint ignore:start */
-var inline_src = (<><![CDATA[
-/* jshint ignore:end */
-    /* jshint esnext: false */
-    /* jshint esversion: 6 */
-
-    // Your code here...
-
-/* jshint ignore:start */
-]]></>).toString();
-var c = Babel.transform(inline_src, { presets: [ "es2015", "es2016" ] });
-eval(c.code);
-/* jshint ignore:end */
 
 $(document).ready(() => {
     console.log('CryptoKitties Extension Loaded');
@@ -34,92 +22,28 @@ $(document).ready(() => {
     $("head").append("<style> .extUSD:focus {  outline:0; } .extUSD:active {  box-shadow: 0 1px rgba(143, 141, 118, 0.6); transform: translateY(2px);} .extUSD:hover {background-color:#dff7f1;}</style>");
     $("head").append("<style> .extCD {  font-size: 1.1rem; font-weight: 100; } </style>");
     $("head").append("<style> .KittyCard { overflow: visible; } </style>");
+    $("head").append("<style> .extKittyWrapper {position:relative; bottom: 0; right: 0; display: flex; flex-direction: row-reverse; align-items: flex-end; } </style>");
 
-    const version = "0.31";
-    const orderedCattributes = [
-          "whixtensions",
-          "gerbil",
-          "dali",
-          "tongue",
-          "beard",
-          "pouty",
-          "saycheese",
-          "happygokitty",
-          "soserious",
-          "peach",
-          "bloodred",
-          "granitegrey",
-          "kittencream",
-          "emeraldgreen",
-          "wolfgrey",
-          "cerulian",
-          "skyblue",
-          "royalpurple",
-          "swampgreen",
-          "violet",
-          "scarlet",
-          "barkbrown",
-          "coffee",
-          "lemonade",
-          "chocolate",
-          "cloudwhite",
-          "shadowgrey",
-          "salmon",
-          "oldlace",
-          "orangesoda",
-          "mauveover",
-          "aquamarine",
-          "greymatter",
-          "fabulous",
-          "googly",
-          "raisedbrow",
-          "otaku",
-          "simple",
-          "crazy",
-          "thicccbrowz",
-          "wingtips",
-          "gold",
-          "limegreen",
-          "topaz",
-          "bubblegum",
-          "mintgreen",
-          "sizzurp",
-          "chestnut",
-          "strawberry",
-          "tigerpunk",
-          "totesbasic",
-          "calicool",
-          "luckystripe",
-          "jaguar",
-          "spock",
-          "totesbasic",
-          "totesbasic",
-          "mainecoon",
-          "laperm",
-          "cymric",
-          "chartreux",
-          "himalayan",
-          "munchkin",
-          "sphynx",
-          "ragamuffin"
-    ];
+    const version = "0.34";
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
     let hasChanged = false;
     let ethPrice = false;
-    let url = location.href;
+    let url = location.pathname;
     let restrictAPI = 0;
     document.body.addEventListener('click', () => {
         requestAnimationFrame(()=> {
-            if (url!==location.href) {
+            if (url !== location.pathname) {
                 //Clears id cache on page change
                 foundId = [];
-                url = location.href;
+                url = location.pathname;
             }
         });
     }, true);
-    let tbl = {"oldlace":{"count":0.017},"wolfgrey":{"count":0.0421},"gerbil":{"count":0.0754},"cottoncandy":{"count":0.13},"violet":{"count":0.2525},"wingtips":{"count":0.267},"mainecoon":{"count":0.4731},"jaguar":{"count":0.8789},"cerulian":{"count":1.0146},"chartreux":{"count":1.3721},"googly":{"count":1.4286},"fabulous":{"count":1.509},"whixtensions":{"count":1.651},"peach":{"count":3.1255},"bubblegum":{"count":3.4188},"dali":{"count":3.5325},"otaku":{"count":4.0565},"skyblue":{"count":4.8908},"gold":{"count":5.0987},"bloodred":{"count":5.2143},"scarlet":{"count":5.306},"tigerpunk":{"count":5.4725},"limegreen":{"count":5.8042},"beard":{"count":6.6335},"cloudwhite":{"count":6.9049},"emeraldgreen":{"count":7.1863},"laperm":{"count":7.5752},"spock":{"count":7.5966},"calicool":{"count":7.6506},"barkbrown":{"count":7.7587},"chestnut":{"count":8.5854},"tongue":{"count":9.2476},"mauveover":{"count":9.6534},"cymric":{"count":11.437},"shadowgrey":{"count":13.4737},"coffee":{"count":13.5572},"saycheese":{"count":14.4958},"salmon":{"count":14.6102},"royalpurple":{"count":14.9337},"mintgreen":{"count":15.7441},"swampgreen":{"count":16.1462},"chocolate":{"count":16.1606},"lemonade":{"count":16.4333},"sphynx":{"count":16.5715},"topaz":{"count":16.6437},"simple":{"count":16.765},"orangesoda":{"count":17.0533},"aquamarine":{"count":17.304},"greymatter":{"count":17.3587},"munchkin":{"count":17.6967},"raisedbrow":{"count":18.5435},"happygokitty":{"count":19.4054},"soserious":{"count":19.6398},"strawberry":{"count":20.2291},"ragamuffin":{"count":20.3453},"sizzurp":{"count":20.9509},"himalayan":{"count":21.047},"pouty":{"count":21.7745},"crazy":{"count":26.5899},"thicccbrowz":{"count":27.3055},"luckystripe":{"count":28.8785},"kittencream":{"count":40.046},"granitegrey":{"count":40.8979},"totesbasic":{"count":45.9847}};
+
+    let tbl = {"Genesis":{"count":' (One)'},"BugCat":{"count":' (Three)'},"Mistletoe":{"count":0.009},"Dracula":{"count":0.062},"ShipCat":{"count":0.2194},"DuCat":{"count":1.0496},"royalblue":{"count":0.0828},"wingtips":{"count":0.3132},"wolfgrey":{"count":0.3915},"oldlace":{"count":0.513},"mainecoon":{"count":0.6337},"violet":{"count":1.0166},"gerbil":{"count":1.0467},"cerulian":{"count":1.1275},"fabulous":{"count":1.4981},"cottoncandy":{"count":1.5491},"chartreux":{"count":1.7489},"jaguar":{"count":2.0837},"dali":{"count":3.2633},"bubblegum":{"count":3.2756},"whixtensions":{"count":3.3428},"peach":{"count":3.9973},"otaku":{"count":4.1494},"googly":{"count":4.2248},"tigerpunk":{"count":4.77},"skyblue":{"count":4.803},"limegreen":{"count":5.5166},"bloodred":{"count":6.0443},"scarlet":{"count":6.0761},"beard":{"count":6.3582},"cloudwhite":{"count":6.5947},"calicool":{"count":7.1994},"laperm":{"count":7.3071},"barkbrown":{"count":7.5338},"tongue":{"count":8.2172},"emeraldgreen":{"count":8.3669},"chestnut":{"count":8.4015},"gold":{"count":8.9369},"spock":{"count":9.056},"mauveover":{"count":11.0459},"shadowgrey":{"count":12.9477},"coffee":{"count":13.3334},"cymric":{"count":13.4623},"salmon":{"count":14.3589},"royalpurple":{"count":14.9657},"mintgreen":{"count":15.0105},"swampgreen":{"count":15.6626},"lemonade":{"count":15.6752},"chocolate":{"count":15.8619},"topaz":{"count":15.9411},"sphynx":{"count":15.9704},"greymatter":{"count":16.1274},"simple":{"count":16.1511},"saycheese":{"count":16.3916},"orangesoda":{"count":16.5409},"aquamarine":{"count":16.8679},"munchkin":{"count":17.429},"raisedbrow":{"count":17.8955},"happygokitty":{"count":18.3734},"soserious":{"count":18.3819},"ragamuffin":{"count":19.6109},"sizzurp":{"count":19.6501},"strawberry":{"count":19.7618},"himalayan":{"count":20.4016},"pouty":{"count":21.0919},"crazy":{"count":25.6307},"thicccbrowz":{"count":26.6106},"luckystripe":{"count":27.4069},"kittencream":{"count":38.2094},"granitegrey":{"count":39.8877},"totesbasic":{"count":45.9613}};
+
     function saveStorage(id, cattributes) {
         if (window.location.pathname == "/my-kitties") {
             storageMyTbl['id'+id] = cattributes;
@@ -152,30 +76,39 @@ $(document).ready(() => {
     let currency = localStorage.getItem('kittyExtensionEtherUSD') || "💲👎";
 
     $.get("https://api.coinmarketcap.com/v1/ticker/ethereum/", data => {
-        ethPrice =  parseInt(data[0].price_usd);
-        $("body").append("<button onclick='switchPrice(event)' class='extUSD extAtt'>"+currency+"</button>");
+        ethPrice =  parseFloat(data[0].price_usd);
+        if (window.location.hostname == 'www.cryptokitties.co') {
+            $("body").append("<button onclick='switchPrice(event)' class='extUSD extAtt'>"+currency+"</button>");
+        }
         changePrices();
     });
     function getColor(catt) {
         let color, count;
-        if (tbl[catt]) {
-            if (tbl[catt].count <= 0.15) {
+        if (catt == 'Fancy' || catt == 'Exclusive') {
+            //To Do?
+        } else if (tbl[catt]) {
+            let uniqe = typeof tbl[catt].count == 'string';
+            if (uniqe || tbl[catt].count <= 0.27) {
                 color = "#ff0dbf"; // legendary
             } else if (tbl[catt].count <= 1.8) {
-                color = "#ff8000"; // legendary
+                color = "#ff8000"; // very rare
             } else if (tbl[catt].count < 8) {
-                color = "#a335ee"; // epic
+                color = "#a335ee"; // rare
             } else if (tbl[catt].count <= 16) {
-                color = "#0070ff"; // rare
+                color = "#0070ff"; // uncommon
             } else if (tbl[catt].count <= 20) {
                 color = "white";   // common
             } else {
                 color = "white";   // common
             }
-            count = tbl[catt].count < 1 ? tbl[catt].count.toFixed(3) : tbl[catt].count.toFixed(1);
-            count = tbl[catt].count <= 20 ? " ("+ count +"%)" : " (20%+)";
+            if (uniqe) {
+                count = tbl[catt].count;
+            } else {
+                count = tbl[catt].count < 1 ? tbl[catt].count.toFixed(3) : tbl[catt].count.toFixed(1);
+                count = tbl[catt].count <= 20 ? " ("+ count +"%)" : " (20%+)";
+            }
         } else {
-            color = "rgba(255,255,255, 0.98)";
+            color = "#ff0dbf";
             count = " (Ultra%)";
         }
         return [color, count];
@@ -189,21 +122,28 @@ $(document).ready(() => {
             if (hasLocalStorage) {
                 if (data.children.length === 0) {
                     let ul = element.getElementsByClassName("extWrapper")[0];
-                    ul.innerHTML += "<ul class='extAttUl'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>&nbsp;virgin&nbsp;</span></li></ul>";
+                    if (ul) {
+                        ul.innerHTML += "<ul class='extAttUl'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>&nbsp;virgin&nbsp;</span></li></ul>";
+                    }
                 }
 
                 if (!data.status.is_ready) {
                     let note = element.getElementsByClassName('KittyStatus-note');
-                    let cd = (((data.status.cooldown - Date.now())/6000/600));
-                    let time = timeDisplay(cd * 3600);
-                    note[note[1] ? 1 : 0].textContent = time;
+                    if (note.length !== 0) {
+                        let cd = (((data.status.cooldown - Date.now())/6000/600));
+                        let time = timeDisplay(cd * 3600);
+                        note[note[1] ? 1 : 0].textContent = time;
+                    }
                 }
                 saveStorage(stats.id, data.cattributes);
             }
         }).fail(() => {
-            let ul = element.getElementsByClassName("extAttUl")[0];
-            ul.classList.remove("extBounce");
-            ul.innerHTML = "😿";
+            //let ul = element.getElementsByClassName("extAttUl")[0];
+            //ul.classList.remove("extBounce");
+            //ul.innerHTML = "😿";
+            setTimeout(() => {
+                requestId(element, stats);
+            }, 1000);
         });
     }
 
@@ -261,7 +201,8 @@ $(document).ready(() => {
             curId = id;
             foundId.push(id);
             let mainSite = window.location.hostname == 'www.cryptokitties.co';
-            let element = mainSite ? nativeElement.getElementsByClassName('KittyCard')[0] : nativeElement;
+            let toolsSite = window.location.hostname == 'kittytools.herokuapp.com';
+            let element = mainSite ? nativeElement.getElementsByClassName('KittyCard')[0] : toolsSite ? nativeElement.parentElement : nativeElement;
             if (element) {
                 let stats = {"id": curId, "fast":false, "gen": false, "cd": false};
                 if (mainSite) {
@@ -277,16 +218,20 @@ $(document).ready(() => {
                     stats.gen = nativeElement.getElementsByClassName('KittyCard-subname')[0].innerText.split('Gen ').pop();
                 }
                 element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
-
+                if (toolsSite) {
+                    let wrapper = element.getElementsByClassName("extWrapper")[0];
+                    wrapper.classList.remove("extWrapper");
+                    wrapper.classList.add("extKittyWrapper");
+                }
                 setTimeout(()=> {
                     console.log('KittyExtension: Requesting - '+ id);
                     requestId(element, stats);
                 }, timer - Date.now());
 
-                restrictAPI += 1000;
+                restrictAPI += 250;
                 setTimeout(()=> {
-                    restrictAPI -= 1000;
-                }, 1000);
+                    restrictAPI -= 250;
+                }, 250);
                 timer = Date.now() + restrictAPI;
             }
         }
@@ -308,8 +253,10 @@ $(document).ready(() => {
                         let color = arr[0];
                         let num = arr[1];
                         cattributes[att].style.backgroundColor = color;
-                        cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
-                        cattributes[att].innerHTML += num;
+                        if (num) {
+                            cattributes[att].style.color = color == 'white' ? '#000' : '#fff';
+                        }
+                        cattributes[att].innerHTML += num ? num : '';
                     }
                 }
             }
@@ -478,7 +425,7 @@ $(document).ready(() => {
                                 item.getElementsByTagName('span')[0].innerText = '$ ' + endPrice;
                             }
                         } else if (currency == "💲👎" && cur[0] != "Ξ") {
-                            let endPrice = (cur[1] / ethPrice ).toFixed(2);
+                            let endPrice = (cur[1] / ethPrice ).toFixed(4);
                             if (endPrice != 'NaN') {
                                 item.getElementsByTagName('span')[0].innerText = 'Ξ ' + endPrice;
                             }
