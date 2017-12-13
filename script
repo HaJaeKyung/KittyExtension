@@ -595,7 +595,7 @@ $(document).ready(() => {
             }
 
             //Adjust for longer term span of the default data
-            let adjuster = defaultTblStorage ? 0.07 : 0.02;
+            let adjuster = defaultTblStorage ? 0.07 : 0.05;
 
             if (tbl[c.description] && tbl[c.description].count/tblNew[c.description].count >= newAvg + adjuster ) {
                 arrow = '<div class="extArrowUp"></span>';
