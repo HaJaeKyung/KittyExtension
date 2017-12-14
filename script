@@ -34,7 +34,15 @@ $(document).ready(() => {
     $("head").append("<style> .extArrowDown {  margin-left: 2px; margin-top: 6px; float: right; border: solid Red; border-width: 0 3px 3px 0; display: inline-block; padding: 3px; transform: rotate(45deg); -webkit-transform: rotate(45deg);} </style>");
     $("body").append("<ul class='extPercentList '></ul>");
 
+
+    let orderedCattributes = [];
+    $.getJSON( "https://api.cryptokitties.co/cattributes?type=true", data => {
+        data.sort((a,b) => (a.type == b.type) ? 0 : ((a.type < b.type) ? -1 : 1)); // group by cattribute type
+        orderedCattributes = data.map(attr => attr.description);
+    })
+
     const version = "0.35";
+
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
@@ -156,6 +164,8 @@ $(document).ready(() => {
 
     function requestId(element, stats) {
         $.getJSON( "https://api.cryptokitties.co/kitties/"+stats.id, data => {
+            // sort cattributes so they are grouped for easier comparison visually
+            data.cattributes.sort((a, b) => orderedCattributes.indexOf(a.description) - orderedCattributes.indexOf(b.description));
             finalizeOverlay(data.cattributes, element, stats);
             if (hasLocalStorage) {
                 if (data.children.length === 0) {
