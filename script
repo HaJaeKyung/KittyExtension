@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.35
+// @version      0.36
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -34,15 +34,8 @@ $(document).ready(() => {
     $("head").append("<style> .extArrowDown {  margin-left: 2px; margin-top: 6px; float: right; border: solid Red; border-width: 0 3px 3px 0; display: inline-block; padding: 3px; transform: rotate(45deg); -webkit-transform: rotate(45deg);} </style>");
     $("body").append("<ul class='extPercentList '></ul>");
 
-
+    const version = "0.36";
     let orderedCattributes = [];
-    $.getJSON( "https://api.cryptokitties.co/cattributes?type=true", data => {
-        data.sort((a,b) => (a.type == b.type) ? 0 : ((a.type < b.type) ? -1 : 1)); // group by cattribute type
-        orderedCattributes = data.map(attr => attr.description);
-    })
-
-    const version = "0.35";
-
     let foundId = [];
     let curCat = 'n/a';
     let curId = 'n/a';
@@ -78,6 +71,7 @@ $(document).ready(() => {
     if (!tbl) {
         tbl = {"Genesis":{"count":' (One)'},"BugCat":{"count":' (Three)'},"Mistletoe":{"count":0.009},"Dracula":{"count":0.062},"ShipCat":{"count":0.2194},"DuCat":{"count":1.0496},"royalblue":{"count":0.0828},"wingtips":{"count":0.3132},"wolfgrey":{"count":0.3915},"oldlace":{"count":0.513},"mainecoon":{"count":0.6337},"violet":{"count":1.0166},"gerbil":{"count":1.0467},"cerulian":{"count":1.1275},"fabulous":{"count":1.4981},"cottoncandy":{"count":1.5491},"chartreux":{"count":1.7489},"jaguar":{"count":2.0837},"dali":{"count":3.2633},"bubblegum":{"count":3.2756},"whixtensions":{"count":3.3428},"peach":{"count":3.9973},"otaku":{"count":4.1494},"googly":{"count":4.2248},"tigerpunk":{"count":4.77},"skyblue":{"count":4.803},"limegreen":{"count":5.5166},"bloodred":{"count":6.0443},"scarlet":{"count":6.0761},"beard":{"count":6.3582},"cloudwhite":{"count":6.5947},"calicool":{"count":7.1994},"laperm":{"count":7.3071},"barkbrown":{"count":7.5338},"tongue":{"count":8.2172},"emeraldgreen":{"count":8.3669},"chestnut":{"count":8.4015},"gold":{"count":8.9369},"spock":{"count":9.056},"mauveover":{"count":11.0459},"shadowgrey":{"count":12.9477},"coffee":{"count":13.3334},"cymric":{"count":13.4623},"salmon":{"count":14.3589},"royalpurple":{"count":14.9657},"mintgreen":{"count":15.0105},"swampgreen":{"count":15.6626},"lemonade":{"count":15.6752},"chocolate":{"count":15.8619},"topaz":{"count":15.9411},"sphynx":{"count":15.9704},"greymatter":{"count":16.1274},"simple":{"count":16.1511},"saycheese":{"count":16.3916},"orangesoda":{"count":16.5409},"aquamarine":{"count":16.8679},"munchkin":{"count":17.429},"raisedbrow":{"count":17.8955},"happygokitty":{"count":18.3734},"soserious":{"count":18.3819},"ragamuffin":{"count":19.6109},"sizzurp":{"count":19.6501},"strawberry":{"count":19.7618},"himalayan":{"count":20.4016},"pouty":{"count":21.0919},"crazy":{"count":25.6307},"thicccbrowz":{"count":26.6106},"luckystripe":{"count":27.4069},"kittencream":{"count":38.2094},"granitegrey":{"count":39.8877},"totesbasic":{"count":45.9613}};
         defaultTblStorage = true;
+        console.log('using default table');
     }
 
     function getJSON(url, cb, fail) {
@@ -133,7 +127,7 @@ $(document).ready(() => {
 
     function getColor(catt) {
         let color, count;
-        let usableTbl = tblNew['royalblue'] ? tblNew : tbl;
+        let usableTbl = tblNew.royalblue ? tblNew : tbl;
         if (catt == 'Fancy' || catt == 'Exclusive') {
             //To Do?
         } else if (usableTbl[catt]) {
@@ -164,8 +158,10 @@ $(document).ready(() => {
 
     function requestId(element, stats) {
         $.getJSON( "https://api.cryptokitties.co/kitties/"+stats.id, data => {
+
             // sort cattributes so they are grouped for easier comparison visually
             data.cattributes.sort((a, b) => orderedCattributes.indexOf(a.description) - orderedCattributes.indexOf(b.description));
+
             finalizeOverlay(data.cattributes, element, stats);
             if (hasLocalStorage) {
                 if (data.children.length === 0) {
@@ -271,10 +267,12 @@ $(document).ready(() => {
                     wrapper.classList.remove("extWrapper");
                     wrapper.classList.add("extKittyWrapper");
                 }
-                setTimeout(()=> {
-                    console.log('KittyExtension: Requesting - '+ id);
-                    requestId(element, stats);
-                }, timer - Date.now());
+                if (tblNew.royalblue) {
+                    setTimeout(()=> {
+                        console.log('KittyExtension: Requesting - '+ id);
+                        requestId(element, stats);
+                    }, timer - Date.now());
+                }
 
                 restrictAPI += 250;
                 setTimeout(()=> {
@@ -513,6 +511,21 @@ $(document).ready(() => {
         localStorage.setItem('kittyExtensionRarityToggle', checked);
     };
 
+    document.extSearch = (value) => {
+        let searchButton = document.getElementsByClassName('InputButtons-button InputButtons-button--primary');
+        if (searchButton.length > 0) {
+            let input = document.getElementsByClassName('InputButtons-input')[0];
+            console.log(input);
+            input.focus();
+            input.select();
+            input.value = value;
+            console.log('clicking');
+            setTimeout(()=>{
+                //searchButton[0].click();
+            }, 100);
+        }
+    };
+
     $(document).bind('DOMSubtreeModified',function(){
         let items = document.getElementsByClassName('KittyStatus-itemText');
         if (items.length != saleNum) {
@@ -557,6 +570,9 @@ $(document).ready(() => {
             if (dataTotal && dataCattributes) {
                 parseCattributes(dataCattributes, dataTotal);
             }
+            let dataCopy = Object.assign([], data);
+            dataCopy.sort((a,b) => (a.type == b.type) ? 0 : ((a.type < b.type) ? -1 : 1)); // group by cattribute type
+            orderedCattributes = dataCopy.map(attr => attr.description);
         }, () => {
             setTimeout(()=>{
                 getCattributes();
@@ -564,14 +580,14 @@ $(document).ready(() => {
         });
     }
 
-    //Stores table of percents that is 12 hours old to compare to current stats
+    //Stores table of percents that is 8 hours old to compare to current stats
     function parseCattributes(data, total) {
         let newTblStorage = localStorage.getItem('kittyExtensionNewTbl') || null;
         let newTblTime = localStorage.getItem('kittyExtensionNewTblTime') || Date.now();
 
-        //Update 'old' table
-        if (newTblTime && Date.now() - newTblTime > 43200000) {
-            console.log('updated old table');
+
+        if (newTblTime && Date.now() - newTblTime > 28800000) {
+            console.log("//Update 'old' table");
             localStorage.setItem('kittyExtensionOldTbl', localStorage.getItem('kittyExtensionNewTbl'));
             tbl = JSON.parse(localStorage.getItem('kittyExtensionOldTbl'));
         }
@@ -605,7 +621,7 @@ $(document).ready(() => {
             }
 
             //Adjust for longer term span of the default data
-            let adjuster = defaultTblStorage ? 0.07 : 0.05;
+            let adjuster = defaultTblStorage ? 0.07 : 0.065;
 
             if (tbl[c.description] && tbl[c.description].count/tblNew[c.description].count >= newAvg + adjuster ) {
                 arrow = '<div class="extArrowUp"></span>';
@@ -614,18 +630,19 @@ $(document).ready(() => {
             }
             let count = tblNew[c.description].count.toFixed(2);
 
-            $(".extPercentList").append("<li class='extRarityList' ><div style=\'background-color:"+background_color+"; color: "+color+"\' class='extPercentListI extAtt'>"+c.description+ " (" + count + "%)</div>"+arrow+"</li>");
+            $(".extPercentList").append("<li class='extRarityList'><a href='https://www.cryptokitties.co/marketplace/sale?orderBy=current_price&orderDirection=asc&sorting=cheap&search="+c.description+"' style=\'background-color:"+background_color+"; color: "+color+"\' class='extPercentListI extAtt'>"+c.description+ " (" + count + "%)</a>"+arrow+"</li>");
         });
 
-        //Update 'new' table
-        if (newTblTime && Date.now() - newTblTime > 43200000) {
+
+        if (newTblTime && Date.now() - newTblTime > 28800000) {
+            console.log("//Update 'new' table");
             localStorage.setItem('kittyExtensionNewTbl', JSON.stringify(tblNew));
             localStorage.setItem('kittyExtensionNewTblTime', Date.now());
         }
 
-        //Initialize 'new' table
+
         if (!newTblStorage) {
-            console.log('initialize new table');
+            console.log("//Initialize 'new' table");
             localStorage.setItem('kittyExtensionNewTbl', JSON.stringify(tblNew));
             localStorage.setItem('kittyExtensionNewTblTime', Date.now());
         }
