@@ -2,7 +2,7 @@
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.36
+// @version      0.37
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -228,12 +228,12 @@ $(document).ready(() => {
         }
 
         //if (window.location.hostname == 'www.cryptokitties.co') {
-            //calcPrice(stats.id , cattributes, stats, element);
+        //calcPrice(stats.id , cattributes, stats, element);
         //}
     }
 
     function isValidId(id) {
-      return !isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity");
+        return !isNaN(id) && id !== "" && id.substring(0,2) != "0x" && id != curId && !foundId.includes(id) && !document.URL.includes("activity");
     }
 
     //Creates overlay on hover
@@ -319,7 +319,6 @@ $(document).ready(() => {
         }
         let rareTbl = getBestRares(cattributes);
         let search = totalGen + rareTbl[0];
-
         function finishPrice(data, index) {
             let newMultiplier = stats.id == data.auctions[index].kitty.id ? 1 : rareTbl[1];
             let nomralizePrice = data.auctions[index].current_price/1000000000000000000;
@@ -352,17 +351,13 @@ $(document).ready(() => {
                             return;
                         }
                     }
-
-
                 }
             } else {
                 renderPrice(element, 'Name your price', query + search, false);
             }
         }).fail(() => {
-
         });
     }
-
     function renderPrice(element, price, url, fast) {
         if (price >= 50) {
             price = Math.ceil(price / 10) * 10;
@@ -373,7 +368,6 @@ $(document).ready(() => {
         let ul = element.getElementsByClassName("extWrapper")[0];
         ul.innerHTML += "<ul class='extAttUl' onclick='searchSimilarKitties(event, &quot;"+ url +"&quot;)'><li style='list-style: none;' class='extAtt'><span style='font-weight: 500;'>Score:</span> " + price + "</li></ul>";
     }
-
     function getBestRares(cattributes, adjust) {
         let newCatts = [];
         for (let single in cattributes) {
@@ -383,7 +377,6 @@ $(document).ready(() => {
         let best = '';
         let hasRare = false;
         let count = adjust || 0;
-
         if (cattributes.length === 0) {
             hasRare = ' type:fancy';
         }
@@ -536,13 +529,13 @@ $(document).ready(() => {
         }
 
         let mItems = document.getElementsByClassName('KittyStatus KittyStatus--multiple');
-         [...mItems].forEach((i)=>{
-             let replace = i.children[1].innerHTML.replace("Resting", "");
-             let hasText = i.children[1].getElementsByClassName("KittyStatus-note")[0];
-             if(hasText && hasText.textContent && hasText.textContent !== '') {
-                 i.children[1].innerHTML = replace;
-             }
-             i.classList.remove('KittyStatus--multiple');
+        [...mItems].forEach((i)=>{
+            let replace = i.children[1].innerHTML.replace("Resting", "");
+            let hasText = i.children[1].getElementsByClassName("KittyStatus-note")[0];
+            if(hasText && hasText.textContent && hasText.textContent !== '') {
+                i.children[1].innerHTML = replace;
+            }
+            i.classList.remove('KittyStatus--multiple');
         });
     });
 
@@ -651,4 +644,93 @@ $(document).ready(() => {
 
     getTotal();
     getCattributes();
+
+    /*=====Add Search to My-Kitty page==========*/
+    (function () {
+
+    $(document).bind('DOMSubtreeModified',function(){
+             var $this = $("a[href='/my-kitties']");
+             $this.off("click");
+             $this.click(function(){
+                 addSearchBar();
+             });
+    });
+
+    if(location.href.toLowerCase().includes('my-kitties') ){
+         addSearchBar();
+    }
+
+    function addSearchBar(){
+        let added = false;
+        let container = false;
+        let searchBar = $('<div class="BrowseSearchBar"><div class="Container"><div class="InputButtons InputButtons--searchSmall">' +
+       '<input type="text" class="InputButtons-input" placeholder="Search Kitties..." value="" maxlength="200">' +
+                  '<div class="InputButtons-buttons">' +
+                     '<button class="InputButtons-button InputButtons-button--primary">Search</button>' +
+                     '<button class="InputButtons-button InputButtons-button--dismiss">Clear</button>' +
+                  '</div>' +
+      '</div></div></div>');
+
+       $(document).bind('DOMSubtreeModified',function(){
+
+           function clickSearch($this){
+                 var search = $this.closest(".Container")
+                            .find(".InputButtons-input")
+                            .val()
+                            .replace(" ", "%20")
+                            .replace(":", "%3A")
+                            .replace(",", "%2C");
+
+                 location.search = "?search=" + search;
+           }
+
+           if(!added && $(".ProfileHeader").length == 1){
+               if($(".ProfileHeader .InputButtons").length === 0){
+                   container = $(".ProfileHeader");
+                   container.append(searchBar);
+                   added = true;
+
+                   // On Enter pushed
+                   container.find(".InputButtons--searchSmall input").focus(function(){
+                            let $this = $(this);
+                            $this.keydown(function(event){
+                                if(event.which == 13){
+                                    event.preventDefault();
+                                    clickSearch($this);
+                                }
+                            });
+                   });
+
+                   // On Search Click
+                   onSearchButtonClick(".InputButtons-button--primary",function($this){
+                       clickSearch($this);
+                   });
+
+                   // On Clear Click
+                   onSearchButtonClick(".InputButtons-button--dismiss",function($this){
+                       $this.closest(".Container")
+                            .find(".InputButtons-input")
+                            .val('');
+                       location.search = '';
+                   });
+
+               }
+           }
+       });
+
+       function onSearchButtonClick(selector,callback){
+           container.find(".InputButtons--searchSmall input").focus(function(){
+                   container.find(selector).hover(function(){
+                       let $this = $(this);
+                       $this.off("mousedown");
+                       $this.mousedown(function(){
+                               callback($this);
+                       });
+                  });
+           });
+       }
+
+    }
+   })();
+
 });
