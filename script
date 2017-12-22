@@ -1,8 +1,8 @@
-// Giving my kitty a like would be much appreciated! 💗 https://www.cryptokitties.co/kitty/18379 💗
+// 💗 Giving my kitty a like would be much appreciated!  https://www.cryptokitties.co/kitty/18379 💗
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.37
+// @version      0.38
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -34,7 +34,7 @@ $(document).ready(() => {
     $("head").append("<style> .extArrowDown {  margin-left: 2px; margin-top: 6px; float: right; border: solid Red; border-width: 0 3px 3px 0; display: inline-block; padding: 3px; transform: rotate(45deg); -webkit-transform: rotate(45deg);} </style>");
     $("body").append("<ul class='extPercentList '></ul>");
 
-    const version = "0.37";
+    const version = "0.38";
     let orderedCattributes = [];
     let foundId = [];
     let curCat = 'n/a';
@@ -259,7 +259,10 @@ $(document).ready(() => {
                         let cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
                         stats.fast = cdTbl.indexOf(speed.innerText);
                     }
-                    stats.gen = nativeElement.getElementsByClassName('KittyCard-details-item')[1].innerText.split('Gen ').pop();
+                    let gen = nativeElement.getElementsByClassName('KittyCard-details-item')[1];
+                    if (gen) {
+                        stats.gen = gen.innerText.split('Gen ').pop();
+                    }
                 }
                 element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
                 if (toolsSite) {
