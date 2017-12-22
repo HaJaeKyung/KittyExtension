@@ -1,8 +1,8 @@
-// Donations are welcome & appreciated!: 0x9aEa53364bBaE27Ff83Ce3f2807c8BbcC71a3FC6
+// Giving my kitty a like would be much appreciated! 💗 https://www.cryptokitties.co/kitty/18379 💗
 // ==UserScript==
 // @name         Crypto Kitty Info Extension
 // @namespace    https://github.com/HaJaeKyung/KittyExtension
-// @version      0.36
+// @version      0.37
 // @description  Adds stat info to the site
 // @author       HaJaeKyung
 // @match        *.cryptokitties.co/*
@@ -34,7 +34,7 @@ $(document).ready(() => {
     $("head").append("<style> .extArrowDown {  margin-left: 2px; margin-top: 6px; float: right; border: solid Red; border-width: 0 3px 3px 0; display: inline-block; padding: 3px; transform: rotate(45deg); -webkit-transform: rotate(45deg);} </style>");
     $("body").append("<ul class='extPercentList '></ul>");
 
-    const version = "0.36";
+    const version = "0.37";
     let orderedCattributes = [];
     let foundId = [];
     let curCat = 'n/a';
@@ -134,11 +134,11 @@ $(document).ready(() => {
             let uniqe = typeof usableTbl[catt].count == 'string';
             if (uniqe || usableTbl[catt].count <= 0.27) {
                 color = "#ff0dbf"; // legendary
-            } else if (usableTbl[catt].count <= 1.8) {
+            } else if (usableTbl[catt].count <= 1.7) {
                 color = "#ff8000"; // very rare
-            } else if (usableTbl[catt].count <= 7) {
+            } else if (usableTbl[catt].count <= 6.5) {
                 color = "#a335ee"; // rare
-            } else if (usableTbl[catt].count <= 16) {
+            } else if (usableTbl[catt].count <= 15) {
                 color = "#0070ff"; // uncommon
             } else {
                 color = "white";   // common
@@ -254,12 +254,12 @@ $(document).ready(() => {
                     if (status) {
                         stats.cd = status.innerHTML.includes("Resting");
                     }
-                    let speed = nativeElement.getElementsByClassName('KittyCard-coldown')[0];
+                    let speed = nativeElement.getElementsByClassName('KittyCard-details-item')[2];
                     if (speed) {
                         let cdTbl = ["Fast", "Swift", "Snappy", "Brisk", "Plodding", "Slow", "Sluggish", "Catatonic"];
                         stats.fast = cdTbl.indexOf(speed.innerText);
                     }
-                    stats.gen = nativeElement.getElementsByClassName('KittyCard-subname')[0].innerText.split('Gen ').pop();
+                    stats.gen = nativeElement.getElementsByClassName('KittyCard-details-item')[1].innerText.split('Gen ').pop();
                 }
                 element.innerHTML += "<div class='extWrapper'><ul style='list-style: none;' class='extBounce extAttUl'>🐈</ul></div>";
                 if (toolsSite) {
@@ -621,7 +621,7 @@ $(document).ready(() => {
             }
 
             //Adjust for longer term span of the default data
-            let adjuster = defaultTblStorage ? 0.07 : 0.065;
+            let adjuster = defaultTblStorage ? 0.07 : 0.0575;
 
             if (tbl[c.description] && tbl[c.description].count/tblNew[c.description].count >= newAvg + adjuster ) {
                 arrow = '<div class="extArrowUp"></span>';
