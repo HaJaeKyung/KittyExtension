@@ -286,6 +286,8 @@ $(document).ready(() => {
         }
     }
     $( "body").on( "mouseover", "a", overlay);
+    $("body").on("mouseover", '.KittyCard-wrapper', function(){$(this).find('.extWrapper').show();});
+    $("body").on('mouseout','.KittyCard-wrapper',function(){$(this).find('.extWrapper').hide();});
 
     //Updates attributes on specific kitty page
     setInterval(() => {
